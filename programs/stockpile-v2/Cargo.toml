@@ -1,0 +1,22 @@
+[package]
+name = "stockpile-v2"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "stockpile_v2"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.26.0", features = ["init-if-needed"] }
+anchor-spl = "0.26.0"
+pyth-sdk-solana = "=0.7.1"
+winnow = "=0.4.1"
