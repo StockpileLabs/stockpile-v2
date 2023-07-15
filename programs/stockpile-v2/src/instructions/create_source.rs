@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 use crate::state::source::*;
 
 pub fn create_source(
-    ctx: Context<CreateFundingSource>,
+    ctx: Context<CreateSource>,
     name: String,
 ) -> Result<()> {
     ctx.accounts.source.set_inner(
@@ -19,7 +19,7 @@ pub fn create_source(
 }
 
 #[derive(Accounts)]
-pub struct CreateFundingSource<'info> {
+pub struct CreateSource<'info> {
     #[account( 
         init,
         space = FundingSource::SPACE,

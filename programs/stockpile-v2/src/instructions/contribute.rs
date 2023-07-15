@@ -6,7 +6,6 @@ use crate::util::mint_is_supported;
 
 pub fn contribute(
     ctx: Context<Contribute>,
-    _pool_id: u64,
     _project_id: u64,
     amount: u64,
 ) -> Result<()> {
@@ -34,7 +33,6 @@ pub fn contribute(
 
 #[derive(Accounts)]
 #[instruction(
-    pool_id: u64,
     project_id: u64,
     _amount: u64, // Anchor barfs if you don't have all ix args
 )]

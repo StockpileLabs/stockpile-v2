@@ -1,15 +1,18 @@
 use anchor_lang::prelude::*;
 
+use crate::error::ProtocolError;
+use crate::state::project::*;
+
 pub fn deactivate_project(ctx: Context<DeactivateProject>) -> Result<()> {
-    let project = ctx.accounts.project;
+    let project = &mut ctx.accounts.project;
     let agent = ctx.accounts.payer.key();
 
     if project.admins.contains(&agent) {
-        project.status = ProjectStatus::Inactive;
+        project.status = ProjectStatus::Deactivated;
         Ok(())
     } else {
         msg!("Payer is not an admin of this project");
-        Err(ErrorCode::NotAuthorized.into())
+        Err(ProtocolError::NotAuthorized.into())
     }
 }
 
@@ -18,7 +21,7 @@ pub struct DeactivateProject<'info> {
     #[account( 
         seeds = [
             Project::SEED_PREFIX.as_bytes(),
-            project_id.to_le_bytes().as_ref(),
+            project.project_id.to_le_bytes().as_ref(),
         ],
         bump = project.bump,
     )]
