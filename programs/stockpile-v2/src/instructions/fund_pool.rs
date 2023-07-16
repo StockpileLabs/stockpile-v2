@@ -11,7 +11,7 @@ use crate::util::{mint_is_supported, set_and_maybe_realloc};
 /// Pools can be funded at any time, they don't have to be active.
 /// They just have to be not closed.
 pub fn fund_pool_spl(
-    ctx: Context<FundPoolSpl>,
+    ctx: Context<FundPool>,
     _pool_id: u64,
     amount: u64,
 ) -> Result<()> {
@@ -61,7 +61,7 @@ pub fn fund_pool_spl(
     pool_id: u64,
     _amount: u64, // Anchor barfs if you don't have all ix args
 )]
-pub struct FundPoolSpl<'info> {
+pub struct FundPool<'info> {
     #[account( 
         mut,
         seeds = [

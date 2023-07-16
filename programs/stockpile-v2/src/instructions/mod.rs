@@ -1,5 +1,4 @@
 pub mod close_milestone;
-pub mod close_pool;
 pub mod close_project;
 pub mod contribute;
 pub mod contribute_milestone;
@@ -15,7 +14,6 @@ pub mod join_pool;
 pub mod withdraw;
 
 pub use close_milestone::*; // Instruction not currently exposed
-pub use close_pool::*; // Instruction not currently exposed
 pub use close_project::*; // Instruction not currently exposed
 pub use contribute::*;
 pub use contribute_milestone::*; // Instruction not currently exposed

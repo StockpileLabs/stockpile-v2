@@ -20,6 +20,9 @@ pub enum ProtocolError {
     #[msg("This pool has already transferred the funds to the receiver")]
     ReleasedFunds,
 
+    #[msg("This project is not currently apart of this pool.")]
+    NotInPool,
+
     #[msg("This pool has already been cancelled")]
     PoolClosed,
 
@@ -46,4 +49,7 @@ pub enum ProtocolError {
 
     #[msg("This key is not authorized to make changes to this account.")]
     NotAuthorized,
+
+    #[msg("This fundraiser is already entered in the current funding round.")]
+    AlreadyEntered,
 }

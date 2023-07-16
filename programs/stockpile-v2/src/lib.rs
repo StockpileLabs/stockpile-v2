@@ -63,4 +63,12 @@ pub mod stockpile_v2 {
     ) -> Result<()> {
         instructions::deactivate_project(ctx)
     }
+
+    pub fn join_pool(
+        ctx: Context<JoinPool>,
+        _project_id: u64,
+        _pool_id: u64,
+    ) -> Result<()> {
+        instructions::join_pool(ctx, _project_id, _pool_id)
+    }
 }

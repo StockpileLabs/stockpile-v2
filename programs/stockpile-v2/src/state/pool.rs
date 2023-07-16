@@ -8,6 +8,7 @@ use crate::{
 };
 
 #[account]
+#[derive(Default)]
 pub struct Pool {
     pub pool_id: u64,
     pub name: String,
@@ -16,6 +17,7 @@ pub struct Pool {
     pub project_shares: HashMap<Pubkey, PoolShare>,
     pub funders: Vec<FundingTicket>,
     pub pool_state: PoolState,
+    pub pool_access: PoolAccess,
     pub bump: u8,
 }
 
@@ -48,6 +50,7 @@ impl Pool {
             project_shares: HashMap::new(),
             funders: vec![],
             pool_state: PoolState::PendingStart,
+            pool_access: PoolAccess::default(),
             bump,
         })
     }
@@ -212,6 +215,22 @@ pub enum PoolState {
     Active,
     Distributed,
     Closed,
+}
+impl Default for PoolState {
+    fn default() -> Self {
+        PoolState::PendingStart
+    }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum PoolAccess {
+    Open,
+    Manual,
+}
+impl Default for PoolAccess {
+    fn default() -> Self {
+        PoolAccess::Open
+    }
 }
 
 fn try_load_price(pyth_account: AccountInfo<'_>) -> Result<f64> {
