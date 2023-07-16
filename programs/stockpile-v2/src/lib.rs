@@ -7,7 +7,7 @@ pub mod util;
 
 pub use instructions::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("5JGt6XDaPuuUttcsu79Jysd6vqtpDFZqLKi1DiGVhMjv");
 
 #[program]
 pub mod stockpile_v2 {
