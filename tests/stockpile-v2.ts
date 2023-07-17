@@ -41,6 +41,7 @@ describe("stockpile-v2", () => {
       project: fundraiserPDA,
       systemProgram: anchor.web3.SystemProgram.programId
     })
+    .signers([ payer ])
     .rpc();
 
     // If it passes, we get a friendly message
@@ -73,6 +74,7 @@ describe("stockpile-v2", () => {
       systemProgram: anchor.web3.SystemProgram.programId,
       pool: poolPDA,
     })
+    .signers([ payer ])
     .rpc();
 
     // If it passes, we get a friendly message

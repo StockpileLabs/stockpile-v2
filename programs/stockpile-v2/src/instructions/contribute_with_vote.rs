@@ -14,6 +14,11 @@ use crate::util::{
     to_pubkey
 };
 
+// Makes a contribution to a fundraiser that is
+// currently participating in a pool. Requires
+// that the fundraiser has invoked the "join_pool"
+// instruction, and is actively participating. Also
+// requires the payer have a valid Civic pass.
 pub fn contribute_with_vote(
     ctx: Context<ContributeWithVote>,
     _pool_id: u64,
@@ -30,25 +35,22 @@ pub fn contribute_with_vote(
     let project_key = ctx.accounts.project.key();
     let mut pool_data = ctx.accounts.pool.clone().into_inner();
 
-    // Check if the project exists in the pool
+    // Iterate through the Participants, and 
+    // check if the project exists in the pool
     // If not: break function and return error
-    if pool_data.project_shares.contains_key(&project_key) {
+    if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {
         let vote_ticket = VoteTicket::new(
             ctx.accounts.payer.key(), 
             Some(ctx.accounts.mint.key()), 
-            amount,
+            amount, 
         );
-        //Change this to a simple insert
-        match pool_data.project_shares.get_mut(&project_key) {
-            Some(record) => record.votes.push(vote_ticket),
-            None => {
-                pool_data.project_shares.insert(
-                    project_key, 
-                    PoolShare::new_with_vote(vote_ticket)
-                );
-                ()
-            }
+
+        // Double check this
+        // Somewhat peculiar
+        if let Some(participant) = pool_data.project_shares.iter_mut().find(|p| p.project_key == project_key) {
+            participant.share_data.votes.push(vote_ticket);
         }
+
         set_and_maybe_realloc(
             &mut ctx.accounts.pool, 
             pool_data, 

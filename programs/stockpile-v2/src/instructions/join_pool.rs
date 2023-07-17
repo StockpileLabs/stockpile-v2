@@ -23,16 +23,19 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
     ctx.accounts.pool.is_active()?;
 
     // Check to make sure the fundraiser isnt already in the pool
-    if pool_data.project_shares.contains_key(&project_key) {
+    if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {
         return Err(ProtocolError::AlreadyEntered.into());
     }
 
     // Check PoolAccess config
     // For now, Open is the only option exposed.
     if pool_data.pool_access == PoolAccess::Open {
-        pool_data.project_shares.insert(
-            project_key, 
-            PoolShare::new()
+
+        pool_data.project_shares.push(
+            Participant::new(
+                project_key, 
+    PoolShare::new(),
+            )
         );
     } else {
         // In the future, this will be an "else if" to

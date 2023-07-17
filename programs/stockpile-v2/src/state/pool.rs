@@ -14,7 +14,7 @@ pub struct Pool {
     pub name: String,
     pub start: u64,
     pub end: u64,
-    pub project_shares: HashMap<Pubkey, PoolShare>,
+    pub project_shares: Vec<Participant>,
     pub funders: Vec<FundingTicket>,
     pub pool_state: PoolState,
     pub pool_access: PoolAccess,
@@ -47,7 +47,7 @@ impl Pool {
             name,
             start,
             end,
-            project_shares: HashMap::new(),
+            project_shares: vec![],
             funders: vec![],
             pool_state: PoolState::PendingStart,
             pool_access: PoolAccess::default(),
@@ -105,10 +105,10 @@ impl Pool {
             let mut sum_of_squared_votes_all_projects_mut: f64 = 0.0;
 
             // Iterate through all of the projects
-            for project in self.project_shares.iter() {
+            for project in self.project_shares.iter_mut() {
                 // Get the sum of all square roots of each vote
                 let total_square_root_votes_usd: f64 = calculate_total_square_root_votes_usd(
-                    &project.1.votes,
+                    &project.share_data.votes,
                     sol_usd_price,
                     usdc_usd_price,
                 )?;
@@ -117,7 +117,7 @@ impl Pool {
                 let sum_of_roots_squared = total_square_root_votes_usd.powi(2);
 
                 // Add to the vote count `HashMap`
-                vote_count_mut.insert(*project.0, sum_of_roots_squared);
+                vote_count_mut.insert(project.project_key, sum_of_roots_squared);
                 sum_of_squared_votes_all_projects_mut += sum_of_roots_squared;
             }
 
@@ -127,11 +127,11 @@ impl Pool {
         // Evaluate each project's distribution from the `vote_count` `HashMap`
         // and update their distribution amount in the `project_shares`
         for project in self.project_shares.iter_mut() {
-            let updated_share = match vote_count.get(project.0) {
+            let updated_share = match vote_count.get(&project.project_key) {
                 Some(vote_count) => vote_count / sum_of_squared_votes_all_projects,
                 None => return Err(ProtocolError::AlgorithmFailure.into()),
             };
-            project.1.share = updated_share;
+            project.share_data.share = updated_share;
         }
 
         Ok(())
@@ -170,7 +170,32 @@ impl FundingTicket {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
+pub struct Participant {
+    pub project_key: Pubkey,
+    pub share_data: PoolShare,
+}
+
+// Double check this to make sure it works
+impl Participant {
+    pub fn new(project_key: Pubkey, share_data: PoolShare) -> Self {
+        Self {
+            project_key: project_key,
+            share_data: share_data,
+        }
+    }
+
+    pub fn new_with_vote(project_key: Pubkey, vote: VoteTicket) -> Self {
+        let new_share = PoolShare::new_with_vote(vote);
+        Self {
+            project_key: project_key,
+            share_data: new_share,
+        }
+    }
+}
+
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub struct PoolShare {
     pub share: f64,
     pub votes: Vec<VoteTicket>,
@@ -192,7 +217,7 @@ impl PoolShare {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub struct VoteTicket {
     pub payer: Pubkey,
     pub mint: Option<Pubkey>,
@@ -209,7 +234,7 @@ impl VoteTicket {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum PoolState {
     PendingStart,
     Active,
@@ -222,7 +247,7 @@ impl Default for PoolState {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub enum PoolAccess {
     Open,
     Manual,
