@@ -44,6 +44,7 @@ pub struct Withdraw<'info> {
     )]
     pub project: Account<'info, Project>,
     #[account(mut, constraint = beneficiary.key() == project.beneficiary)]
+    /// CHECK: This account is safe because we don't write to it
     pub beneficiary: AccountInfo<'info>,
     #[account(
         init_if_needed,
