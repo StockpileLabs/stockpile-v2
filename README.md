@@ -50,7 +50,7 @@ solana --version && anchor --version
 <p>Clone this repository</p>
     
 ```
-git clone ***
+git clone https://github.com/StockpileProtocol/stockpile-v2.git
 ```
 <br>
 <p>Build & generate an IDL</p>
