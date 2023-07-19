@@ -12,6 +12,7 @@ pub mod deactivate_project;
 pub mod fund_pool;
 pub mod join_pool;
 pub mod withdraw;
+pub mod withdraw_all;
 
 pub use close_milestone::*; // Instruction not currently exposed
 pub use close_project::*; // Instruction not currently exposed
@@ -27,3 +28,4 @@ pub use deactivate_project::*;
 pub use fund_pool::*;
 pub use join_pool::*;
 pub use withdraw::*;
+pub use withdraw_all::*;

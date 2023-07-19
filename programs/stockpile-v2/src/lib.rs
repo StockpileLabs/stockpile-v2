@@ -1,3 +1,32 @@
+/*
+
+
+█████╗█████╗█████╗
+╚════╝╚════╝╚════╝
+
+
+
+███████╗████████╗ ██████╗  ██████╗██╗  ██╗██████╗ ██╗██╗     ███████╗
+██╔════╝╚══██╔══╝██╔═══██╗██╔════╝██║ ██╔╝██╔══██╗██║██║     ██╔════╝
+███████╗   ██║   ██║   ██║██║     █████╔╝ ██████╔╝██║██║     █████╗
+╚════██║   ██║   ██║   ██║██║     ██╔═██╗ ██╔═══╝ ██║██║     ██╔══╝
+███████║   ██║   ╚██████╔╝╚██████╗██║  ██╗██║     ██║███████╗███████╗
+╚══════╝   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝
+
+
+
+█████╗█████╗█████╗
+╚════╝╚════╝╚════╝
+
+Copyright 2023 Stockpile,
+
+www.stockpile.pro
+www.twitter.com/GoStockpile
+
+DISCLAIMER:
+This code is currently unaudited, while reusing and duplication are allowed, please do so at your own risk.
+*/
+
 use anchor_lang::prelude::*;
 
 pub mod error;
@@ -70,5 +99,18 @@ pub mod stockpile_v2 {
         _pool_id: u64,
     ) -> Result<()> {
         instructions::join_pool(ctx, _project_id, _pool_id)
+    }
+
+    pub fn withdraw(
+        ctx: Context<Withdraw>,
+        amount: u64,
+    ) -> Result<()> {
+        instructions::withdraw(ctx, amount)
+    }
+
+    pub fn withdraw_all(
+        ctx: Context<WithdrawAll>
+    ) -> Result<()> {
+        instructions::withdraw_all(ctx)
     }
 }

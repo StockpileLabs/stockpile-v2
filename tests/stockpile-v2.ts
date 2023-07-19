@@ -21,11 +21,11 @@ describe("stockpile-v2", () => {
 
     // Generate a beneficiary keypair and random projectId
     let beneficiary = anchor.web3.Keypair.generate().publicKey;
-    let projectId = new Uint8Array(Math.random())
+    let projectId = new Uint8Array(Math.floor(10000 + Math.random() * 90000))
 
     // Find PDA address
     const [fundraiserPDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
-        [utf8.encode("project"), projectId],
+        [Buffer.from("project"), projectId],
         program.programId
     );
 
@@ -51,14 +51,14 @@ describe("stockpile-v2", () => {
   it("createPool", async () => {
     // Generate payer keypair, and random poolId
     const payer = anchor.web3.Keypair.generate();
-    let poolId = new Uint8Array(Math.random())
+    let poolId = new Uint8Array(Math.floor(10000 + Math.random() * 90000))
 
     // Fund payer account
     connection.requestAirdrop(payer.publicKey, 2);
 
     // Find PDA address
     const [poolPDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
-        [utf8.encode("pool"), poolId],
+        [Buffer.from("pool"), poolId],
         program.programId
     );
 

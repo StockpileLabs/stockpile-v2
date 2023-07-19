@@ -5,10 +5,10 @@ use crate::error::ProtocolError;
 
 use crate::state::project::*;
 
-/// Withdraws a specified amount of USDC from the vault
+/// Withdraws all of the USDC from the vault
 /// and sends to the beneficiary. Requires that the payer
 /// be a fundraiser admin.
-pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+pub fn withdraw_all(ctx: Context<WithdrawAll>) -> Result<()> {
     let payer_key = ctx.accounts.payer.key();
     let project = &mut ctx.accounts.project;
 
@@ -19,22 +19,19 @@ pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             token::Transfer {
-                from: ctx.accounts.project_token_account.clone().to_account_info(),
-                to: ctx.accounts.beneficiary_token_account.clone().to_account_info(),
-                authority: ctx.accounts.payer.clone().to_account_info(),
+                from: ctx.accounts.project_token_account.to_account_info(),
+                to: ctx.accounts.beneficiary_token_account.to_account_info(),
+                authority: ctx.accounts.payer.to_account_info(),
             },
         ),
-        amount,
+        project.balance.into(),
     )?;
 
     Ok(())
 }
 
 #[derive(Accounts)]
-#[instruction(
-    _amount: u64,
-)]
-pub struct Withdraw<'info> {
+pub struct WithdrawAll<'info> {
     #[account( 
         seeds = [
             Project::SEED_PREFIX.as_bytes(),

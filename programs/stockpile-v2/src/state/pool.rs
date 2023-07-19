@@ -25,6 +25,10 @@ impl Pool {
     pub const SEED_PREFIX: &'static str = "pool";
 
     pub const SPACE: usize = 8
+        + 32                        // Vec (empty)
+        + 32                        // Vec (empty)
+        + 32                        // Pubkey
+        + 8                         // f64
         + 4                         // u64
         + 4 + MAX_NAME_LEN          // String
         + 4                         // u64
@@ -32,7 +36,8 @@ impl Pool {
         + 4                         // HashMap (empty)
         + 4                         // Vec (empty)
         + 1                         // Enum (singleton)
-        + 1; // u8
+        + 1                         // u8
+        + 1;                        // u8
 
     pub fn new(pool_id: u64, name: String, start: u64, end: u64, bump: u8) -> Result<Self> {
         if name.as_bytes().len() > MAX_NAME_LEN {
