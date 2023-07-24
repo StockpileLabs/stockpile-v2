@@ -10,11 +10,16 @@ with drawbacks. They're almost certain to never pass since they rely
 on devnet airdrops, and you know how that goes. However we can deduce
 whether they would've worked. I've skipped pre-flight on each instruction
 so log will print to the console once the tests finish. 0x1 represents 
-"lack of funds", and means the instruction would have worked if we we're 
-on localnet, or staging with a real wallet.
+"lack of funds from payer", and means the instruction would have worked 
+if we were on localnet, or staging with a real wallet. Additionally,
+I haven't found a reliable devnet faucet for USDC, so there's another
+constraint for ya.
 
 Eventually I'll write a CI pipeline, which I anticipate will run the test
 validator without fail, unlike my machine.
+
+TLDR: These tests fail on devnet because Solana is a game of versioning
+whack-a-mole. If your machine can run localnet, then do that.
 */
 
 describe("stockpile-v2", () => {
@@ -44,7 +49,7 @@ describe("stockpile-v2", () => {
     );
 
     // Define dummy values
-    let name = "Sample Project";
+    let name = "Nautilus";
     let admins = [adminKp1.publicKey, adminKp2.publicKey];
     let goal = 100;
   
@@ -61,7 +66,7 @@ describe("stockpile-v2", () => {
     });
 
     // If it passes, we get a friendly message
-    console.log("🚀 Project Created! Transaction Hash:", tx);
+    console.log(`🚀 Project "${name}" Created! Transaction Hash:`, tx);
   });
 
   it("createPool", async () => {
@@ -79,7 +84,7 @@ describe("stockpile-v2", () => {
     );
 
     // Define dummy values
-    let name = "Sample Project";
+    let name = "Money Laundering Machine";
     let start = new anchor.BN(Math.floor(Date.now() / 1000));
     let end = new anchor.BN(Math.floor(Date.now() / 1000) + 30000);
   
@@ -96,6 +101,120 @@ describe("stockpile-v2", () => {
     });
 
     // If it passes, we get a friendly message
-    console.log("👾 Funding Round Initialized! Transaction Hash:", tx);
+    console.log(`👾 Funding Round "${name}" Initialized! Transaction Hash:`, tx);
+  });
+
+  it("createSource", async () => {
+    // Generate keypairs for payer, and admins
+    const payer = anchor.web3.Keypair.generate();
+
+    // Fund payer account
+    await connection.requestAirdrop(payer.publicKey, 2);
+
+    // Find PDA address
+    const [sourcePDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
+        [utf8.encode("source"), payer.publicKey.toBuffer()],
+        program.programId
+    );
+
+    // Define dummy value
+    let name = "Buffalo Joe";
+  
+    // Run it up
+    const tx = await program.methods.createSource(name)
+    .accounts({
+      payer: payer.publicKey,
+      source: sourcePDA,
+      systemProgram: anchor.web3.SystemProgram.programId
+    })
+    .signers([ payer ])
+    .rpc({
+      skipPreflight: true
+    });
+
+    // If it passes, we get a friendly message
+    console.log(`✨ Source "${name}" Created! Transaction Hash:`, tx);
+  });
+
+  it("joinPool", async () => {
+    // Generate keypairs for payer, and admins
+    const payer = anchor.web3.Keypair.generate();
+    let adminKp1 = anchor.web3.Keypair.generate();
+    let adminKp2 = anchor.web3.Keypair.generate();
+
+    // Fund payer account
+    await connection.requestAirdrop(payer.publicKey, 2);
+
+    let beneficiary = anchor.web3.Keypair.generate().publicKey;
+    let projectId = Math.floor(10000 + Math.random() * 90000)
+
+    // Find project PDA address
+    const [fundraiserPDA, fundraiserBump] = await anchor.web3.PublicKey.findProgramAddressSync(
+        [utf8.encode("fundraiser"), new anchor.BN(projectId).toArrayLike(Buffer, "le", 8),],
+        program.programId
+    );
+
+    // Define dummy values
+    let projectName = "Motherfuckin' Demons from the planet Jupiter";
+    let admins = [adminKp1.publicKey, adminKp2.publicKey];
+    let goal = 100;
+  
+    // Create project
+    const projectTx = await program.methods.createProject(new anchor.BN(projectId), projectName, admins, beneficiary, goal)
+    .accounts({
+      payer: payer.publicKey,
+      project: fundraiserPDA,
+      systemProgram: anchor.web3.SystemProgram.programId
+    })
+    .signers([ payer ])
+    .rpc({
+      skipPreflight: true
+    });
+
+    let poolId = Math.floor(1 + Math.random() * 9);
+
+    // Find pool PDA address
+    const [poolPDA, poolBump] = await anchor.web3.PublicKey.findProgramAddressSync(
+      [utf8.encode("pool"), new anchor.BN(poolId).toArrayLike(Buffer, "le", 8)],
+      program.programId
+    );
+
+    // Define more dummy values
+    let poolName = "Dill Clyntin";
+    let start = new anchor.BN(Math.floor(Date.now() / 1000));
+    let end = new anchor.BN(Math.floor(Date.now() / 1000) + 30000);
+
+    // Create a pool
+    const poolTx = await program.methods.createPool(new anchor.BN(poolId), poolName, start, end)
+    .accounts({
+      payer: payer.publicKey,
+      systemProgram: anchor.web3.SystemProgram.programId,
+      pool: poolPDA,
+    })
+    .signers([ payer ])
+    .rpc({
+      skipPreflight: true
+    });
+  
+    // Fire when ready captain
+    const tx = await program.methods.joinPool(new anchor.BN(projectId), new anchor.BN(poolId))
+    .accounts({
+      payer: payer.publicKey,
+      pool: poolPDA,
+      project: fundraiserPDA,
+      systemProgram: anchor.web3.SystemProgram.programId
+    })
+    .signers([ payer ])
+    .rpc({
+      skipPreflight: true
+    });
+
+    // If it passes, we get a friendly message
+    console.log(`
+      ✨ Pool "${poolName}" Joined w/ Project "${projectName}"! 
+      Project Tx Hash: ${projectTx}, 
+      Pool Tx Hash: ${poolTx}, 
+      Join Tx Hash: ${tx}
+    `);
   });
 });
