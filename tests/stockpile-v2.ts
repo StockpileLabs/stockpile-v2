@@ -3,6 +3,20 @@ import { Program } from "@project-serum/anchor";
 import { StockpileV2 } from "../target/types/stockpile_v2";
 import { utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 
+/*
+Localnet env works about half the time depending on version. These
+tests are set to devnet so they'll run everytime, however this comes
+with drawbacks. They're almost certain to never pass since they rely
+on devnet airdrops, and you know how that goes. However we can deduce
+whether they would've worked. I've skipped pre-flight on each instruction
+so log will print to the console once the tests finish. 0x1 represents 
+"lack of funds", and means the instruction would have worked if we we're 
+on localnet, or staging with a real wallet.
+
+Eventually I'll write a CI pipeline, which I anticipate will run the test
+validator without fail, unlike my machine.
+*/
+
 describe("stockpile-v2", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 

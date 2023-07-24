@@ -10,7 +10,7 @@ use crate::util::{mint_is_supported, set_and_maybe_realloc};
 /// Funds a pool from a `Source` with an SPL Token.
 /// Pools can be funded at any time, they don't have to be active.
 /// They just have to be not closed.
-pub fn fund_pool_spl(
+pub fn fund_pool(
     ctx: Context<FundPool>,
     _pool_id: u64,
     amount: u64,
@@ -51,6 +51,8 @@ pub fn fund_pool_spl(
         ),
         amount,
     )?;
+
+    ctx.accounts.pool.totalFunding += amount;
     
     Ok(())
 }

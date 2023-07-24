@@ -101,6 +101,14 @@ pub mod stockpile_v2 {
         instructions::join_pool(ctx, _project_id, _pool_id)
     }
 
+    pub fn fund_pool(
+        ctx: Context<FundPool>,
+        _pool_id: u64,
+        amount: u64,
+    ) -> Result<()> {
+        instructions::fund_pool(ctx, _pool_id, amount)
+    }
+
     pub fn withdraw(
         ctx: Context<Withdraw>,
         amount: u64,
