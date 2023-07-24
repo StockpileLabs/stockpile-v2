@@ -4,7 +4,8 @@ use std::str::FromStr;
 
 use crate::error::ProtocolError;
 
-pub const MAX_NAME_LEN: usize = 50;
+pub const MAX_NAME_LEN: usize = 100;
+pub const MAX_ADMIN_LEN: usize = 4;
 
 pub const USDC_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 

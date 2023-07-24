@@ -26,7 +26,7 @@ impl Project {
         + 32                        // Pubkey
         + 1;                        // u8
 
-    pub fn new(project_id: u64, name: String, authority: Pubkey, admins: Vec<Pubkey>, goal: u8, beneficiary: Pubkey, bump: u8) -> Result<Self> {
+    pub fn new(project_id: u64, name: String, admins: Vec<Pubkey>, goal: u8, beneficiary: Pubkey, bump: u8) -> Result<Self> {
         let initial: u8 = 0;
         if name.as_bytes().len() > MAX_NAME_LEN {
             return Err(ProtocolError::NameTooLong.into());

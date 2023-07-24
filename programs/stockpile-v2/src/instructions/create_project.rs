@@ -22,7 +22,6 @@ pub fn create_project(
             Project::new(
                 project_id,
                 name,
-                ctx.accounts.payer.key(),
                 admins,
                 goal,
                 beneficiary,
@@ -36,7 +35,6 @@ pub fn create_project(
             Project::new(
                 project_id,
                 name,
-                ctx.accounts.payer.key(),
                 admins,
                 goal,
                 beneficiary,
@@ -68,5 +66,6 @@ pub struct CreateProject<'info> {
     pub project: Account<'info, Project>,
     #[account(mut)]
     pub payer: Signer<'info>,
+    pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
 }

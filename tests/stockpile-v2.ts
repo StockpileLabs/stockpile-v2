@@ -17,15 +17,15 @@ describe("stockpile-v2", () => {
     let adminKp2 = anchor.web3.Keypair.generate();
 
     // Fund payer account
-    connection.requestAirdrop(payer.publicKey, 2);
+    await connection.requestAirdrop(payer.publicKey, 2);
 
     // Generate a beneficiary keypair and random projectId
     let beneficiary = anchor.web3.Keypair.generate().publicKey;
-    let projectId = new Uint8Array(Math.floor(10000 + Math.random() * 90000))
+    let projectId = Math.floor(10000 + Math.random() * 90000)
 
     // Find PDA address
     const [fundraiserPDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
-        [Buffer.from("project"), projectId],
+        [utf8.encode("fundraiser"), new anchor.BN(projectId).toArrayLike(Buffer, "le", 8),],
         program.programId
     );
 
@@ -42,7 +42,9 @@ describe("stockpile-v2", () => {
       systemProgram: anchor.web3.SystemProgram.programId
     })
     .signers([ payer ])
-    .rpc();
+    .rpc({
+      skipPreflight: true
+    });
 
     // If it passes, we get a friendly message
     console.log("🚀 Project Created! Transaction Hash:", tx);
@@ -51,14 +53,14 @@ describe("stockpile-v2", () => {
   it("createPool", async () => {
     // Generate payer keypair, and random poolId
     const payer = anchor.web3.Keypair.generate();
-    let poolId = new Uint8Array(Math.floor(10000 + Math.random() * 90000))
+    let poolId = Math.floor(1 + Math.random() * 9)
 
     // Fund payer account
-    connection.requestAirdrop(payer.publicKey, 2);
+    await connection.requestAirdrop(payer.publicKey, 2);
 
     // Find PDA address
     const [poolPDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
-        [Buffer.from("pool"), poolId],
+        [utf8.encode("pool"), new anchor.BN(poolId).toArrayLike(Buffer, "le", 8)],
         program.programId
     );
 
@@ -75,7 +77,9 @@ describe("stockpile-v2", () => {
       pool: poolPDA,
     })
     .signers([ payer ])
-    .rpc();
+    .rpc({
+      skipPreflight: true
+    });
 
     // If it passes, we get a friendly message
     console.log("👾 Funding Round Initialized! Transaction Hash:", tx);
