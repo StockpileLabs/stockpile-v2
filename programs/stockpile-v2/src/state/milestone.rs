@@ -7,9 +7,9 @@ use crate::{error::ProtocolError, util::{MAX_NAME_LEN, MAX_ADMIN_LEN}};
 pub struct Milestone {
     pub milestone_id: u64,
     pub name: String,
-    pub local_raised: u8, // Denominated in USDC
-    pub local_goal: u8, // Denominated in USDC
-    pub local_balance: u8, // Denominated in USDC
+    pub local_raised: u64, // Denominated in USDC
+    pub local_goal: u64, // Denominated in USDC
+    pub local_balance: u64, // Denominated in USDC
     pub contributors: u8,
     pub associated_project: Pubkey,
     pub bump: u8,
@@ -23,33 +23,47 @@ impl Milestone {
         + 4                         // u64
         + 4 + MAX_NAME_LEN          // String
         + 32                        // Pubkey
-        + 1                         // u8
-        + 1                         // u8
-        + 1                         // u8
+        + 8                         // u64
+        + 8                         // u64
+        + 8                         // u64
         + 1                         // u8
         + 1                         // u8
         + 1 + 42;                   // Enum
 
-    pub fn new(project_id: u64, name: String, authority: Pubkey, admins: Vec<Pubkey>, goal: u8, beneficiary: Pubkey, bump: u8) -> Result<Self> {
-        let initial: u8 = 0;
+    pub fn new(milestone_id: u64, name: String, goal: u64, associated_project: Pubkey, bump: u8) -> Result<Self> {
+        let initial: u64 = 0;
         if name.as_bytes().len() > MAX_NAME_LEN {
-            return Err(ProtocolError::NameTooLong.into());
-        }
-        // Length of admin vector can be more than 4, for space reasons
-        if admins.len() > MAX_ADMIN_LEN {
             return Err(ProtocolError::NameTooLong.into());
         }
         Ok(Self {
             milestone_id,
             name,
             local_raised: initial,
-            local_goal,
+            local_goal: goal,
             local_balance: initial,
-            contributors: initial,
+            contributors: initial as u8,
             associated_project,
             bump,
             ..Default::default()
         })
+    }
+
+    pub fn deactivate(&mut self) -> Result<()> {
+        self.is_active()?;
+        self.status = MilestoneStatus::Deactivated;
+        Ok(())
+    }
+
+    pub fn reactivate(&mut self) -> Result<()> {
+        self.is_active()?;
+        self.status = MilestoneStatus::Active;
+        Ok(())
+    }
+
+    pub fn close(&mut self) -> Result<()> {
+        self.is_active()?;
+        self.status = MilestoneStatus::Closed;
+        Ok(())
     }
 
     pub fn is_active(&self) -> Result<()> {
@@ -65,7 +79,6 @@ impl Milestone {
 pub enum MilestoneStatus {
     Active,
     Deactivated,
-    Distributed,
     Closed,
 }
 impl Default for MilestoneStatus {
