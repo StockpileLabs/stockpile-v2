@@ -12,7 +12,7 @@ use crate::{
 pub struct Pool {
     pub pool_id: u64,
     pub name: String,
-    pub totalFunding: u64,
+    pub total_funding: u64,
     pub start: u64,
     pub end: u64,
     pub project_shares: Vec<Participant>,
@@ -52,7 +52,7 @@ impl Pool {
         Ok(Self {
             pool_id,
             name,
-            totalFunding: 0,
+            total_funding: 0,
             start,
             end,
             project_shares: vec![],

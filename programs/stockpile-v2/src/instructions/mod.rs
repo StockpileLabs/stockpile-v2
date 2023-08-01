@@ -14,13 +14,13 @@ pub mod join_pool;
 pub mod withdraw;
 pub mod withdraw_all;
 
-pub use close_milestone::*; // Instruction not currently exposed
-pub use close_project::*; // Instruction not currently exposed
+pub use close_milestone::*;
+pub use close_project::*;
 pub use contribute::*;
 pub use contribute_milestone::*; // Instruction not currently exposed
 pub use contribute_milestone_with_vote::*; // Instruction not currently exposed
 pub use contribute_with_vote::*;
-pub use create_milestone::*; // Instruction not currently exposed
+pub use create_milestone::*; 
 pub use create_pool::*;
 pub use create_project::*;
 pub use create_source::*;

@@ -70,6 +70,15 @@ pub mod stockpile_v2 {
         instructions::create_source(ctx, name)
     }
 
+    pub fn create_milestone(
+        ctx: Context<CreateMilestone>,
+        milestone_id: u64,
+        name: String,
+        goal: u64,
+    ) -> Result<()> {
+        instructions::create_milestone(ctx, milestone_id, name, goal)
+    }
+
     pub fn contribute(
         ctx: Context<Contribute>,
         _project_id: u64,
@@ -120,5 +129,17 @@ pub mod stockpile_v2 {
         ctx: Context<WithdrawAll>
     ) -> Result<()> {
         instructions::withdraw_all(ctx)
+    }
+
+    pub fn close_project(
+        ctx: Context<CloseProject>
+    ) -> Result<()> {
+        instructions::close_project(ctx)
+    }
+
+    pub fn close_milestone(
+        ctx: Context<CloseMilestone>
+    ) -> Result<()> {
+        instructions::close_milestone(ctx)
     }
 }

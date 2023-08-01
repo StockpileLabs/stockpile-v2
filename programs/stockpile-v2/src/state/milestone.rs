@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::ProtocolError, util::{MAX_NAME_LEN, MAX_ADMIN_LEN}};
+use crate::{error::ProtocolError, util::MAX_NAME_LEN};
 
 #[account]
 #[derive(Default)]
@@ -46,24 +46,6 @@ impl Milestone {
             bump,
             ..Default::default()
         })
-    }
-
-    pub fn deactivate(&mut self) -> Result<()> {
-        self.is_active()?;
-        self.status = MilestoneStatus::Deactivated;
-        Ok(())
-    }
-
-    pub fn reactivate(&mut self) -> Result<()> {
-        self.is_active()?;
-        self.status = MilestoneStatus::Active;
-        Ok(())
-    }
-
-    pub fn close(&mut self) -> Result<()> {
-        self.is_active()?;
-        self.status = MilestoneStatus::Closed;
-        Ok(())
     }
 
     pub fn is_active(&self) -> Result<()> {

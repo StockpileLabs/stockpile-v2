@@ -52,7 +52,7 @@ pub fn fund_pool(
         amount,
     )?;
 
-    ctx.accounts.pool.totalFunding += amount;
+    ctx.accounts.pool.total_funding += amount;
     
     Ok(())
 }
