@@ -1,6 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{token, associated_token};
 
+use solana_gateway::{Gateway, VerificationOptions};
+
 use crate::error::ProtocolError;
 use crate::state::{
     pool::*,
@@ -25,11 +27,29 @@ pub fn contribute_with_vote(
     _project_id: u64,
     amount: u64,
 ) -> Result<()> {
+    //Define Civic gateway pubkey
+    pub const GATEKEEPER_NETWORK: &'static str = "uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv";
+
+    // Convert to Pubkey & define verification options
+    let gatekeeper_network = to_pubkey(GATEKEEPER_NETWORK);
+    let verification_options = VerificationOptions {
+        check_expiry: true,
+        expiry_tolerance_seconds: Some(0),
+    };
+
     // Check to make sure the token is supported
     mint_is_supported(&ctx.accounts.mint.key())?;
 
     // Check to make sure the pool is not closed
     ctx.accounts.pool.is_active()?;
+
+    // Perform Civic pass verification
+    Gateway::verify_gateway_token_account_info(
+        &ctx.accounts.gateway_token_account, 
+        &ctx.accounts.payer.key(), 
+        &gatekeeper_network,
+        Some(verification_options),
+    ).expect("User must have a valid Civic pass to create a vote.");
 
     // Add the project to the shares, if it doesn't exist
     let project_key = ctx.accounts.project.key();
@@ -133,6 +153,8 @@ pub struct ContributeWithVote<'info> {
         token::authority = payer,
     )]
     pub payer_token_account: Account<'info, token::TokenAccount>,
+    /// CHECK: This is not unsafe because this account isn't written to
+    pub gateway_token_account: AccountInfo<'info>,
     #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,

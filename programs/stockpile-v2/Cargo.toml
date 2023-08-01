@@ -21,3 +21,4 @@ anchor-spl = "0.26.0"
 pyth-sdk-solana = "=0.7.1"
 winnow = "=0.4.1"
 toml_datetime="=0.6.1"
+solana-gateway = { version = "0.3.1", features = ["no-entrypoint"] }
