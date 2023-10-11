@@ -11,7 +11,7 @@ pub fn create_project(
     name: String,
     mut admins: Vec<Pubkey>,
     beneficiary: Pubkey,
-    goal: u8,
+    goal: u64,
 ) -> Result<()> {
 
     if admins.len() == 0 {

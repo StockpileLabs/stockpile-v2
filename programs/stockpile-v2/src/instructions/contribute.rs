@@ -24,8 +24,8 @@ pub fn contribute(
         amount,
     )?;
 
-    ctx.accounts.project.raised += amount as u8;
-    ctx.accounts.project.balance += amount as u8;
+    ctx.accounts.project.raised += amount;
+    ctx.accounts.project.balance += amount;
     ctx.accounts.project.contributors += 1;
 
     Ok(())

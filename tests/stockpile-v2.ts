@@ -54,7 +54,7 @@ describe("stockpile-v2", () => {
     let goal = 100;
   
     // Let it fly
-    const tx = await program.methods.createProject(new anchor.BN(projectId), name, admins, beneficiary, goal)
+    const tx = await program.methods.createProject(new anchor.BN(projectId), name, admins, beneficiary, new anchor.BN(goal))
     .accounts({
       payer: payer.publicKey,
       project: fundraiserPDA,
@@ -160,7 +160,7 @@ describe("stockpile-v2", () => {
     let goal = 100;
   
     // Create project
-    const projectTx = await program.methods.createProject(new anchor.BN(projectId), projectName, admins, beneficiary, goal)
+    const projectTx = await program.methods.createProject(new anchor.BN(projectId), projectName, admins, beneficiary, new anchor.BN(goal))
     .accounts({
       payer: payer.publicKey,
       project: fundraiserPDA,

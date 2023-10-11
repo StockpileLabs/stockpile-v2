@@ -7,9 +7,9 @@ use crate::{error::ProtocolError, util::MAX_NAME_LEN};
 pub struct Project {
     pub project_id: u64,
     pub name: String,
-    pub raised: u8, // Denominated in USDC
-    pub goal: u8, // Denominated in USDC
-    pub balance: u8, // Denominated in USDC
+    pub raised: u64, // Denominated in USDC
+    pub goal: u64, // Denominated in USDC
+    pub balance: u64, // Denominated in USDC
     pub contributors: u8,
     pub admins: Vec<Pubkey>,
     pub beneficiary: Pubkey,
@@ -24,10 +24,11 @@ impl Project {
         + 4                         // u64
         + 4 + MAX_NAME_LEN          // String
         + 32                        // Pubkey
-        + 1;                        // u8
+        + 1                         // u8
+        + 1000;
 
-    pub fn new(project_id: u64, name: String, admins: Vec<Pubkey>, goal: u8, beneficiary: Pubkey, bump: u8) -> Result<Self> {
-        let initial: u8 = 0;
+    pub fn new(project_id: u64, name: String, admins: Vec<Pubkey>, goal: u64, beneficiary: Pubkey, bump: u8) -> Result<Self> {
+        let initial: u64 = 0;
         if name.as_bytes().len() > MAX_NAME_LEN {
             return Err(ProtocolError::NameTooLong.into());
         }
@@ -37,7 +38,7 @@ impl Project {
             raised: initial,
             goal,
             balance: initial,
-            contributors: initial,
+            contributors: initial as u8,
             admins,
             beneficiary,
             bump,

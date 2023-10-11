@@ -36,7 +36,7 @@ pub mod util;
 
 pub use instructions::*;
 
-declare_id!("5JGt6XDaPuuUttcsu79Jysd6vqtpDFZqLKi1DiGVhMjv");
+declare_id!("HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32");
 
 #[program]
 pub mod stockpile_v2 {
@@ -48,7 +48,7 @@ pub mod stockpile_v2 {
         name: String,
         admins: Vec<Pubkey>,
         beneficiary: Pubkey,
-        goal: u8,
+        goal: u64,
     ) -> Result<()> {
         instructions::create_project(ctx, project_id, name, admins, beneficiary, goal)
     }

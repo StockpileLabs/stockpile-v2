@@ -30,7 +30,6 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
     // Check PoolAccess config
     // For now, Open is the only option exposed.
     if pool_data.pool_access == PoolAccess::Open {
-
         pool_data.project_shares.push(
             Participant::new(
                 project_key, 

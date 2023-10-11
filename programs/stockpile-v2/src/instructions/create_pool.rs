@@ -9,6 +9,9 @@ pub fn create_pool(
     start: u64,
     end: u64,
 ) -> Result<()> {
+
+    
+
     ctx.accounts.pool.set_inner(
         Pool::new(
             pool_id,
