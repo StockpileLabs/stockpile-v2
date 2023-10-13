@@ -47,7 +47,7 @@ impl Pool {
             return Err(ProtocolError::NameTooLong.into());
         }
         let current_time = Clock::get()?.unix_timestamp as u64;
-        if current_time < start {
+        if current_time > start {
             return Err(ProtocolError::PoolInvalidStart.into());
         }
         Ok(Self {

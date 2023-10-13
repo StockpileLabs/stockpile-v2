@@ -72,6 +72,9 @@ describe("stockpile-v2", () => {
   it("createPool", async () => {
     // Generate payer keypair, and random poolId
     const payer = anchor.web3.Keypair.generate();
+    const admin1 = anchor.web3.Keypair.generate();
+    const admin2 = anchor.web3.Keypair.generate();
+    const admin3 = anchor.web3.Keypair.generate();
     let poolId = Math.floor(1 + Math.random() * 9)
 
     // Fund payer account
@@ -87,9 +90,16 @@ describe("stockpile-v2", () => {
     let name = "Money Laundering Machine";
     let start = new anchor.BN(Math.floor(Date.now() / 1000));
     let end = new anchor.BN(Math.floor(Date.now() / 1000) + 30000);
+    let admins = [admin1.publicKey, admin2.publicKey, admin3.publicKey];
   
     // Alea iacta est
-    const tx = await program.methods.createPool(new anchor.BN(poolId), name, start, end)
+    const tx = await program.methods.createPool(
+      new anchor.BN(poolId), 
+      name, 
+      new anchor.BN(start), 
+      new anchor.BN(end), 
+      admins
+    )
     .accounts({
       payer: payer.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
@@ -185,7 +195,13 @@ describe("stockpile-v2", () => {
     let end = new anchor.BN(Math.floor(Date.now() / 1000) + 30000);
 
     // Create a pool
-    const poolTx = await program.methods.createPool(new anchor.BN(poolId), poolName, start, end)
+    const poolTx = await program.methods.createPool(
+      new anchor.BN(poolId), 
+      poolName, 
+      new anchor.BN(start), 
+      new anchor.BN(end), 
+      admins
+    )
     .accounts({
       payer: payer.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
