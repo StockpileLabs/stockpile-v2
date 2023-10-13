@@ -59,8 +59,9 @@ pub mod stockpile_v2 {
         name: String,
         start: u64,
         end: u64,
+        admins: Vec<Pubkey>
     ) -> Result<()> {
-        instructions::create_pool(ctx, pool_id, name, start, end)
+        instructions::create_pool(ctx, pool_id, name, start, end, admins)
     }
 
     pub fn create_source(

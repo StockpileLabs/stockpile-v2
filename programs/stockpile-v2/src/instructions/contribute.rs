@@ -7,7 +7,7 @@ use crate::util::mint_is_supported;
 pub fn contribute(
     ctx: Context<Contribute>,
     _project_id: u64,
-    amount: u64,
+    mut amount: u64,
 ) -> Result<()> {
     // Check to make sure the token is supported
     mint_is_supported(&ctx.accounts.mint.key())?;
@@ -24,6 +24,9 @@ pub fn contribute(
         amount,
     )?;
 
+    amount /= 10_u64.pow(6);
+
+    //Increment fields
     ctx.accounts.project.raised += amount;
     ctx.accounts.project.balance += amount;
     ctx.accounts.project.contributors += 1;
@@ -38,6 +41,7 @@ pub fn contribute(
 )]
 pub struct Contribute<'info> {
     #[account( 
+        mut,
         seeds = [
             Project::SEED_PREFIX.as_bytes(),
             project_id.to_le_bytes().as_ref(),
@@ -47,8 +51,7 @@ pub struct Contribute<'info> {
     pub project: Account<'info, Project>,
     pub mint: Account<'info, token::Mint>,
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = mint,
         token::authority = project,
     )]

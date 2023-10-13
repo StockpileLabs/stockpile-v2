@@ -33,7 +33,7 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
         pool_data.project_shares.push(
             Participant::new(
                 project_key, 
-    PoolShare::new(),
+                PoolShare::new(),
             )
         );
     } else {

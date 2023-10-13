@@ -8,11 +8,12 @@ pub const MAX_NAME_LEN: usize = 100;
 pub const MAX_ADMIN_LEN: usize = 4;
 
 pub const USDC_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+pub const USDC_DEVNET_MINT: &str = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 
 pub const SOL_USD_PRICE_FEED_ID: &str = "ALP8SdU9oARYVLgLR7LrqMNCYBnhtnQz1cj6bwgwQmgj";
 pub const USDC_USD_PRICE_FEED_ID: &str = "8GWTTbNiXdmyZREXbjsZBmCRuzdPrW55dnZGDkTRjWvb";
 
-pub const SUPPORTED_SPL_MINTS: [&'static str; 1] = [USDC_MINT];
+pub const SUPPORTED_SPL_MINTS: [&'static str; 2] = [USDC_MINT, USDC_DEVNET_MINT];
 
 pub fn to_pubkey(string: &str) -> Pubkey {
     Pubkey::from_str(&string).expect("Error parsing public key from string.")

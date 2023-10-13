@@ -15,6 +15,7 @@ pub struct Pool {
     pub total_funding: u64,
     pub start: u64,
     pub end: u64,
+    pub admins: Vec<Pubkey>,
     pub project_shares: Vec<Participant>,
     pub funders: Vec<FundingTicket>,
     pub pool_state: PoolState,
@@ -41,7 +42,7 @@ impl Pool {
         + 1                         // u8
         + 1;                        // u8
 
-    pub fn new(pool_id: u64, name: String, start: u64, end: u64, bump: u8) -> Result<Self> {
+    pub fn new(pool_id: u64, name: String, start: u64, end: u64, admins: Vec<Pubkey>, bump: u8) -> Result<Self> {
         if name.as_bytes().len() > MAX_NAME_LEN {
             return Err(ProtocolError::NameTooLong.into());
         }
@@ -55,6 +56,7 @@ impl Pool {
             total_funding: 0,
             start,
             end,
+            admins,
             project_shares: vec![],
             funders: vec![],
             pool_state: PoolState::PendingStart,
