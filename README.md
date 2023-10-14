@@ -1,8 +1,8 @@
-<img src="https://i.imgur.com/bEwIk6P.png">
+<img src="https://i.imgur.com/hA5WEnT.jpg">
 <div align="center">
-  <img src="https://badgen.net/badge/version/2.0/orange">
-  <img src="https://badgen.net/badge/docs/2.0/orange">
-  <img src="https://badgen.net/badge/contributions/open/orange">
+  <img src="https://badgen.net/badge/version/2.0/blue">
+  <img src="https://badgen.net/badge/docs/2.0/blue">
+  <img src="https://badgen.net/badge/contributions/open/blue">
 </div>
 <h1 align="center">Stockpile v2</h1>
 <div align="center">
