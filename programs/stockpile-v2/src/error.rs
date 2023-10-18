@@ -35,6 +35,9 @@ pub enum ProtocolError {
     #[msg("The pool has not begun its funding round yet")]
     PoolNotStarted,
 
+    #[msg("Tried to add a fundraiser to pool when config is set to Open")]
+    MismatchedConfig,
+
     #[msg("The end date has already passed")]
     EndDatePassed,
 

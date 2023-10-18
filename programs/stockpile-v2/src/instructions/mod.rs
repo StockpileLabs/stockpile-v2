@@ -1,3 +1,4 @@
+pub mod add_project;
 pub mod close_milestone;
 pub mod close_project;
 pub mod contribute;
@@ -14,6 +15,7 @@ pub mod join_pool;
 pub mod withdraw;
 pub mod withdraw_all;
 
+pub use add_project::*;
 pub use close_milestone::*;
 pub use close_project::*;
 pub use contribute::*;
