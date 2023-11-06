@@ -18,13 +18,15 @@
 █████╗█████╗█████╗
 ╚════╝╚════╝╚════╝
 
-Copyright 2023 Stockpile,
+Copyright 2023 Stockpile Labs,
 
-www.stockpile.pro
+www.stockpile.so
 www.twitter.com/GoStockpile
 
 DISCLAIMER:
-This code is currently unaudited, while reusing and duplication are allowed, please do so at your own risk.
+This code is currently unaudited, while reusing 
+and duplication are allowed, please do so at your
+own risk. Please consult the license for more information.
 */
 
 use anchor_lang::prelude::*;
@@ -35,11 +37,13 @@ pub mod state;
 pub mod util;
 
 pub use instructions::*;
+use crate::state::pool::*;
 
 declare_id!("HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32");
 
 #[program]
 pub mod stockpile_v2 {
+
     use super::*;
 
     pub fn create_project(
@@ -59,9 +63,10 @@ pub mod stockpile_v2 {
         name: String,
         start: u64,
         end: u64,
-        admins: Vec<Pubkey>
+        admins: Vec<Pubkey>,
+        access: PoolAccess
     ) -> Result<()> {
-        instructions::create_pool(ctx, pool_id, name, start, end, admins)
+        instructions::create_pool(ctx, pool_id, name, start, end, admins, access)
     }
 
     pub fn create_source(

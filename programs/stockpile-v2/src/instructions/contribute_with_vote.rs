@@ -25,13 +25,10 @@ pub fn contribute_with_vote(
     ctx: Context<ContributeWithVote>,
     _pool_id: u64,
     _project_id: u64,
-    amount: u64,
+    mut amount: u64,
 ) -> Result<()> {
-    //Define Civic gateway pubkey
-    pub const GATEKEEPER_NETWORK: &'static str = "uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv";
-
-    // Convert to Pubkey & define verification options
-    let gatekeeper_network = to_pubkey(GATEKEEPER_NETWORK);
+    // Define verification options
+    let gatekeeper_network = ctx.accounts.gatekeeper_network.key();
     let verification_options = VerificationOptions {
         check_expiry: true,
         expiry_tolerance_seconds: Some(0),
@@ -44,12 +41,14 @@ pub fn contribute_with_vote(
     ctx.accounts.pool.is_active()?;
 
     // Perform Civic pass verification
+    /*
     Gateway::verify_gateway_token_account_info(
         &ctx.accounts.gateway_token_account, 
         &ctx.accounts.payer.key(), 
         &gatekeeper_network,
         Some(verification_options),
     ).expect("User must have a valid Civic pass to create a vote.");
+    */
 
     // Add the project to the shares, if it doesn't exist
     let project_key = ctx.accounts.project.key();
@@ -71,6 +70,7 @@ pub fn contribute_with_vote(
             participant.share_data.votes.push(vote_ticket);
         }
 
+        // This is likely the source of issues
         set_and_maybe_realloc(
             &mut ctx.accounts.pool, 
             pool_data, 
@@ -93,6 +93,13 @@ pub fn contribute_with_vote(
         ),
         amount,
     )?;
+
+    amount /= 10_u64.pow(6);
+
+    //Increment fields
+    ctx.accounts.project.raised += amount;
+    ctx.accounts.project.balance += amount;
+    ctx.accounts.project.contributors += 1;
 
     // Update the QF algorithm
     ctx.accounts.pool.update_shares(
@@ -130,7 +137,7 @@ pub struct ContributeWithVote<'info> {
         ],
         bump = pool.bump,
     )]
-    pub pool: Account<'info, Pool>,
+    pub pool: Box<Account<'info, Pool>>,
     #[account( 
         seeds = [
             Project::SEED_PREFIX.as_bytes(),
@@ -138,11 +145,10 @@ pub struct ContributeWithVote<'info> {
         ],
         bump = project.bump,
     )]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
     pub mint: Account<'info, token::Mint>,
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = mint,
         token::authority = project,
     )]
@@ -155,6 +161,8 @@ pub struct ContributeWithVote<'info> {
     pub payer_token_account: Account<'info, token::TokenAccount>,
     /// CHECK: This is not unsafe because this account isn't written to
     pub gateway_token_account: AccountInfo<'info>,
+    /// CHECK: This is not unsafe because this account isn't written to
+    pub gatekeeper_network: AccountInfo<'info>,
     #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,

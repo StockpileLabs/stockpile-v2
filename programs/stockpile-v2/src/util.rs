@@ -28,6 +28,8 @@ pub fn mint_is_supported(mint_pubkey: &Pubkey) -> Result<()> {
     Err(ProtocolError::MintNotSupported.into())
 }
 
+// This is likely causing issues in "contribute_w_vote"
+// Writing unit tests to reconcile this
 pub fn set_and_maybe_realloc<'info, T>(
     account: &mut Account<'info, T>,
     new_data: T,
@@ -68,3 +70,25 @@ where
     account.set_inner(new_data);
     Ok(())
 }
+
+/* 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn try_set_and_realloc<'info, T>() -> Result<()>
+        where
+            T: AccountDeserialize
+                + AccountSerialize
+                + borsh::BorshDeserialize
+                + borsh::BorshSerialize
+                + Clone + anchor_lang::Owner,
+     {
+        let blank: &mut Account<'info, T> = {
+            
+        }
+
+        Ok(())
+    }
+}
+*/

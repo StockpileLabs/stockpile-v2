@@ -37,9 +37,8 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
             )
         );
     } else {
-        // In the future, this will be an "else if" to
-        // check Manual or Open, and issue a JoinRequest
-        // For now, return pool closed due to AIDS
+        // If pool is set to "Manual", return error
+        // Pool closed due to AIDS
         // https://i.imgur.com/LqFSv8w.jpeg 
         return Err(ProtocolError::PoolClosed.into());
     }
