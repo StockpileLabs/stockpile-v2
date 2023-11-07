@@ -73,3 +73,8 @@ anchor build
   This code is unaudited. Copy and use at your own risk. We incur no liability in the event that a third-party uses this code, and has
   issues deriving from exploits or any other attacks.
 </p>
+<h2>Credits</h2>
+<p>
+  Thank you to Joe C (Solana Labs) & Valentin Madrid (Squads) for helping to get us started.
+</p>
+
