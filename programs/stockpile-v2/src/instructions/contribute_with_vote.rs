@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::system_program;
 use anchor_spl::{token, associated_token};
 
 use solana_gateway::{Gateway, VerificationOptions};
@@ -8,11 +9,10 @@ use crate::state::{
     pool::*,
     project::*,
 };
-use crate::util::{
-    SOL_USD_PRICE_FEED_ID, 
+use crate::util::{ 
     USDC_USD_PRICE_FEED_ID, 
-    mint_is_supported, 
-    set_and_maybe_realloc, 
+    set_and_maybe_realloc,
+    mint_is_supported,
     to_pubkey
 };
 
@@ -28,10 +28,11 @@ pub fn contribute_with_vote(
     mut amount: u64,
 ) -> Result<()> {
     // Define verification options
-    let gatekeeper_network = ctx.accounts.gatekeeper_network.key();
+    //let gatekeeper_network = ctx.accounts.gatekeeper_network.key();
+    let payer = ctx.accounts.payer.key();
     let verification_options = VerificationOptions {
         check_expiry: true,
-        expiry_tolerance_seconds: Some(0),
+        expiry_tolerance_seconds: Some(120),
     };
 
     // Check to make sure the token is supported
@@ -47,7 +48,7 @@ pub fn contribute_with_vote(
         &ctx.accounts.payer.key(), 
         &gatekeeper_network,
         Some(verification_options),
-    ).expect("User must have a valid Civic pass to create a vote.");
+    ).expect("User must have a valid Civic Pass to cast a vote.");
     */
 
     // Add the project to the shares, if it doesn't exist
@@ -57,29 +58,30 @@ pub fn contribute_with_vote(
     // Iterate through the Participants, and 
     // check if the project exists in the pool
     // If not: break function and return error
-    if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {
+    if let Some(participant) = pool_data.project_shares.iter_mut().find(|p| p.project_key == project_key) {
         let vote_ticket = VoteTicket::new(
-            ctx.accounts.payer.key(), 
+            payer, 
             Some(ctx.accounts.mint.key()), 
             amount, 
         );
 
-        // Double check this
-        // Somewhat peculiar
-        if let Some(participant) = pool_data.project_shares.iter_mut().find(|p| p.project_key == project_key) {
-            participant.share_data.votes.push(vote_ticket);
-        }
+    if let Some(payer_vote_ticket) = participant.share_data.votes.iter_mut().find(|t| t.payer == payer) {
+        payer_vote_ticket.amount += amount;
+    } else {
+        participant.share_data.votes.push(vote_ticket);
 
-        // This is likely the source of issues
         set_and_maybe_realloc(
             &mut ctx.accounts.pool, 
-            pool_data, 
+            &pool_data, 
             ctx.accounts.payer.to_account_info(), 
             ctx.accounts.system_program.to_account_info()
         )?;
+    }
+        ctx.accounts.pool.set_inner(pool_data);
     } else {
         return Err(ProtocolError::NotInPool.into());
     }
+
 
     // Transfer the vote to the project
     token::transfer(
@@ -96,14 +98,13 @@ pub fn contribute_with_vote(
 
     amount /= 10_u64.pow(6);
 
-    //Increment fields
+    // Increment fields
     ctx.accounts.project.raised += amount;
     ctx.accounts.project.balance += amount;
     ctx.accounts.project.contributors += 1;
 
     // Update the QF algorithm
     ctx.accounts.pool.update_shares(
-        ctx.accounts.pyth_sol_usd.to_account_info(),
         ctx.accounts.pyth_usdc_usd.to_account_info(),
     )?;
 
@@ -118,11 +119,13 @@ pub fn contribute_with_vote(
 )]
 pub struct ContributeWithVote<'info> {
     /// CHECK: Pyth will check this
+    /*
     #[account(
         address = to_pubkey(SOL_USD_PRICE_FEED_ID)
             @ ProtocolError::PythAccountInvalid
     )]
     pub pyth_sol_usd: UncheckedAccount<'info>,
+    */
     /// CHECK: Pyth will check this
     #[account(
         address = to_pubkey(USDC_USD_PRICE_FEED_ID)
@@ -131,6 +134,9 @@ pub struct ContributeWithVote<'info> {
     pub pyth_usdc_usd: UncheckedAccount<'info>,
     #[account( 
         mut,
+        realloc = 1024,
+        realloc::payer = payer,
+        realloc::zero = false,
         seeds = [
             Pool::SEED_PREFIX.as_bytes(),
             pool_id.to_le_bytes().as_ref(),
@@ -159,10 +165,12 @@ pub struct ContributeWithVote<'info> {
         token::authority = payer,
     )]
     pub payer_token_account: Account<'info, token::TokenAccount>,
+    /*
     /// CHECK: This is not unsafe because this account isn't written to
     pub gateway_token_account: AccountInfo<'info>,
     /// CHECK: This is not unsafe because this account isn't written to
     pub gatekeeper_network: AccountInfo<'info>,
+    */
     #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,

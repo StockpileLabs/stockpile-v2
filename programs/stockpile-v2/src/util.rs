@@ -11,7 +11,8 @@ pub const USDC_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 pub const USDC_DEVNET_MINT: &str = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 
 pub const SOL_USD_PRICE_FEED_ID: &str = "ALP8SdU9oARYVLgLR7LrqMNCYBnhtnQz1cj6bwgwQmgj";
-pub const USDC_USD_PRICE_FEED_ID: &str = "8GWTTbNiXdmyZREXbjsZBmCRuzdPrW55dnZGDkTRjWvb";
+// THIS IS DEVNET
+pub const USDC_USD_PRICE_FEED_ID: &str = "5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7";
 
 pub const SUPPORTED_SPL_MINTS: [&'static str; 2] = [USDC_MINT, USDC_DEVNET_MINT];
 
@@ -28,11 +29,9 @@ pub fn mint_is_supported(mint_pubkey: &Pubkey) -> Result<()> {
     Err(ProtocolError::MintNotSupported.into())
 }
 
-// This is likely causing issues in "contribute_w_vote"
-// Writing unit tests to reconcile this
 pub fn set_and_maybe_realloc<'info, T>(
     account: &mut Account<'info, T>,
-    new_data: T,
+    new_data: &T,
     payer: AccountInfo<'info>,
     system_program: AccountInfo<'info>,
 ) -> Result<()>
@@ -67,7 +66,7 @@ where
         // Serialize new data
         account_info.realloc(new_account_size, false)?;
     }
-    account.set_inner(new_data);
+    //account.set_inner(new_data);
     Ok(())
 }
 
