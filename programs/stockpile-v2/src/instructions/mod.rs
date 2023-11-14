@@ -14,6 +14,7 @@ pub mod fund_pool;
 pub mod join_pool;
 pub mod withdraw;
 pub mod withdraw_all;
+pub mod claim_payout;
 
 pub use add_project::*;
 pub use close_milestone::*;
@@ -31,3 +32,4 @@ pub use fund_pool::*;
 pub use join_pool::*;
 pub use withdraw::*;
 pub use withdraw_all::*;
+pub use claim_payout::*;

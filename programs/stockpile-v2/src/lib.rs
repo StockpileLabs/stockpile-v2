@@ -43,7 +43,6 @@ declare_id!("HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32");
 
 #[program]
 pub mod stockpile_v2 {
-
     use super::*;
 
     pub fn create_project(
@@ -80,9 +79,9 @@ pub mod stockpile_v2 {
         ctx: Context<CreateMilestone>,
         milestone_id: u64,
         name: String,
-        goal: u64,
+        percentage: f64,
     ) -> Result<()> {
-        instructions::create_milestone(ctx, milestone_id, name, goal)
+        instructions::create_milestone(ctx, milestone_id, name, percentage)
     }
 
     pub fn contribute(
@@ -155,5 +154,13 @@ pub mod stockpile_v2 {
         ctx: Context<CloseMilestone>
     ) -> Result<()> {
         instructions::close_milestone(ctx)
+    }
+
+    pub fn claim_payout(
+        ctx: Context<ClaimPayout>,
+        _project_id: u64,
+        _pool_id: u64,
+    ) -> Result<()> {
+        instructions::claim_payout(ctx, _project_id, _pool_id)
     }
 }

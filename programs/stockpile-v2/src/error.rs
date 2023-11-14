@@ -11,6 +11,9 @@ pub enum ProtocolError {
     #[msg("Failed to price from Pyth price feed. Perhaps price was too old")]
     PythPriceFeedPriceFailed,
 
+    #[msg("Failed to load Civic Pass credentials.")]
+    CivicFailure,
+
     #[msg("Provided SPL Mint not supported")]
     MintNotSupported,
 
@@ -47,7 +50,16 @@ pub enum ProtocolError {
     #[msg("This project is currently inactive.")]
     DeactivatedProject,
 
-    #[msg("This project has been closed a registered admin.")]
+    #[msg("This milestone is currently closed.")]
+    ClosedMilestone,
+
+    #[msg("This milestone is still open.")]
+    OpenMilestone,
+
+    #[msg("This milestone is being reconciled.")]
+    MilestoneIsReconciling,
+
+    #[msg("This project has been closed by a registered admin.")]
     ClosedProject,
 
     #[msg("This key is not authorized to make changes to this account.")]
@@ -55,4 +67,7 @@ pub enum ProtocolError {
 
     #[msg("This fundraiser is already entered in the current funding round.")]
     AlreadyEntered,
+
+    #[msg("This project has already claimed their grant.")]
+    AlreadyClaimed,
 }

@@ -13,6 +13,7 @@ pub struct Pool {
     pub pool_id: u64,
     pub name: String,
     pub total_funding: u64,
+    pub balance: u64,
     pub start: u64,
     pub end: u64,
     pub admins: Vec<Pubkey>,
@@ -27,21 +28,18 @@ impl Pool {
     pub const SEED_PREFIX: &'static str = "pool";
 
     pub const SPACE: usize = 8
-        + 32                        // Vec (empty)
-        + 32                        // Vec (empty)
-        + 32                        // Pubkey
-        + 8                         // f64
-        + 4                         // u64
         + 4                         // u64
         + 4 + MAX_NAME_LEN          // String
         + 4                         // u64
         + 4                         // u64
-        + 4                         // HashMap (empty)
-        + 4                         // Vec (empty)
-        + 1                         // Enum (singleton)
+        + 4                         // u64
+        + 160                       // Vec<Pubkey> (Max 5)
+        + 32                        // Vec<Participants> (Initial Alloc. for 10 participants w/ 20 votes)
+        + 32                        // Vec<FundingTicket> (Initial Alloc. for 5)
+        + 4                         // Enum (singleton)
+        + 4                         // Enum (singleton)
         + 1                         // u8
-        + 1                         // u8
-        + 2500;                     // Extra
+        + 300;                      // Padding
 
     pub fn new(pool_id: u64, name: String, start: u64, end: u64, admins: Vec<Pubkey>, access: PoolAccess, bump: u8) -> Result<Self> {
         if name.as_bytes().len() > MAX_NAME_LEN {
@@ -55,6 +53,7 @@ impl Pool {
             pool_id,
             name,
             total_funding: 0,
+            balance: 0,
             start,
             end,
             admins,
@@ -170,15 +169,34 @@ impl Pool {
     }
 
     /// Issues all payments according to the `project_shares`
-    pub fn close_and_issue_payments(
+    pub fn close_and_open_claim(
         &mut self,
         pyth_usdc_usd: AccountInfo<'_>,
         _accounts: &[AccountInfo<'_>],
     ) -> Result<()> {
         let usdc_usd_price = try_load_price(pyth_usdc_usd)?;
         let _pool_total_usd = self.calculate_pool_total_usd(usdc_usd_price)?;
-        // TODO: Leverage "additional accounts" to match up `Project` addresses
-        // and pay every project out
+        
+        /*
+        for account in _accounts {
+            if let Some(participant) = self.project_shares.iter().find(|p| p.project_key == *account.key()) {
+                let participant_share_usd = self.total_funding * participant.share_data.share as u64;
+
+                token::transfer(
+                    CpiContext::new(
+                        ctx.accounts.token_program.to_account_info(),
+                        token::Transfer {
+                            from: ctx.accounts.payer_token_account.to_account_info(),
+                            to: ctx.accounts.project_token_account.to_account_info(),
+                            authority: payer,
+                        },
+                    ),
+                    amount,
+                )?;
+            }
+        }
+        */
+
         Ok(())
     }
 }
@@ -203,6 +221,7 @@ impl FundingTicket {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
 pub struct Participant {
     pub project_key: Pubkey,
+    pub claimed: bool,
     pub share_data: PoolShare,
 }
 
@@ -211,6 +230,7 @@ impl Participant {
     pub fn new(project_key: Pubkey, share_data: PoolShare) -> Self {
         Self {
             project_key: project_key,
+            claimed: false,
             share_data: share_data,
         }
     }
@@ -219,6 +239,7 @@ impl Participant {
         let new_share = PoolShare::new_with_vote(vote);
         Self {
             project_key: project_key,
+            claimed: false,
             share_data: new_share,
         }
     }
@@ -389,6 +410,7 @@ mod tests {
         let participants = vec![
                 Participant {
                     project_key: Pubkey::new_unique(),
+                    claimed: false,
                     share_data: PoolShare {
                         share: 0.0,
                         votes: vec![
@@ -401,6 +423,7 @@ mod tests {
                 },
                 Participant {
                     project_key: Pubkey::new_unique(),
+                    claimed: false,
                     share_data: PoolShare {
                         share: 0.0,
                         votes: vec![
@@ -416,6 +439,7 @@ mod tests {
             pool_id: 12345,
             name: "Sample Pool".to_owned(),
             total_funding: 1000,
+            balance: 1000,
             start: 0,
             end: 0,
             admins: vec![admin],
@@ -523,6 +547,7 @@ mod tests {
         let participants = vec![
                 Participant {
                     project_key: Pubkey::new_unique(),
+                    claimed: false,
                     share_data: PoolShare {
                         share: 0.0,
                         votes: vec![
@@ -535,6 +560,7 @@ mod tests {
                 },
                 Participant {
                     project_key: Pubkey::new_unique(),
+                    claimed: false,
                     share_data: PoolShare {
                         share: 0.0,
                         votes: vec![
@@ -550,6 +576,7 @@ mod tests {
             pool_id: 12345,
             name: "Sample Pool".to_owned(),
             total_funding: 1000,
+            balance: 1000,
             start: 0,
             end: 0,
             admins: vec![admin],
@@ -564,6 +591,7 @@ mod tests {
 
         let participant = Participant {
                 project_key: Pubkey::new_unique(),
+                claimed: false,
                 share_data: PoolShare {
                 share: 0.0,
                 votes: vec![]
