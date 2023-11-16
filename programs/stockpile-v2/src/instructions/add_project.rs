@@ -13,7 +13,7 @@ use crate::state::{
 pub fn add_project(ctx: Context<AddProject>, _project_id: u64, _pool_id: u64) -> Result<()> {
     let payer_key = ctx.accounts.payer.key();
     let project_key = ctx.accounts.project.key();
-    let mut pool_data = ctx.accounts.pool.clone().into_inner();
+    let pool_data = ctx.accounts.pool.clone().into_inner();
 
     // Pool access control check
     require!(pool_data.admins.contains(&payer_key), ProtocolError::NotAuthorized);
@@ -27,11 +27,13 @@ pub fn add_project(ctx: Context<AddProject>, _project_id: u64, _pool_id: u64) ->
     }
 
     if pool_data.pool_access == PoolAccess::Manual {
-        pool_data.project_shares.push(
-            Participant::new(
-                project_key, 
-                PoolShare::new(),
-            )
+        ctx.accounts.pool
+        .add_participant(project_key)
+        .expect("Failed to add project.");
+
+        msg!(
+            "Fundraiser successfully entered with data: {:?}", 
+            project_key.to_string()
         );
     } else {
         // Return an error if the PoolAccess is set to open

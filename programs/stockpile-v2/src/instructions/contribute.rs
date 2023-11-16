@@ -7,7 +7,7 @@ use crate::util::mint_is_supported;
 pub fn contribute(
     ctx: Context<Contribute>,
     _project_id: u64,
-    mut amount: u64,
+    amount: u64,
 ) -> Result<()> {
     // Check to make sure the token is supported
     mint_is_supported(&ctx.accounts.mint.key())?;
@@ -23,8 +23,6 @@ pub fn contribute(
         ),
         amount,
     )?;
-
-    amount /= 10_u64.pow(6);
 
     //Increment fields
     ctx.accounts.project.raised += amount;

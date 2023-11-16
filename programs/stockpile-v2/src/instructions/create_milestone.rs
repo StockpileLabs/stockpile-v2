@@ -11,7 +11,7 @@ pub fn create_milestone(
     ctx: Context<CreateMilestone>,
     milestone_id: u64,
     name: String,
-    goal: u64,
+    percentage: f64,
 ) -> Result<()> {
     let payer_key = &mut ctx.accounts.payer.key();
     let project = &mut ctx.accounts.project;
@@ -21,7 +21,7 @@ pub fn create_milestone(
             Milestone::new(
                 milestone_id,
                 name,
-                goal,
+                percentage,
                 project.key(),
                 *ctx.bumps
                     .get("milestone")

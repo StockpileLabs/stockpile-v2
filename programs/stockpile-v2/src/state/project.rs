@@ -23,9 +23,15 @@ impl Project {
     pub const SPACE: usize = 8 
         + 4                         // u64
         + 4 + MAX_NAME_LEN          // String
+        + 4                         // u64
+        + 4                         // u64
+        + 4                         // u64
+        + 1                         // u8
+        + 160                       // Vec<Pubkey> (Max 5)
         + 32                        // Pubkey
         + 1                         // u8
-        + 1000;
+        + 4                         // Enum (Singleton)
+        + 250;                      // Padding
 
     pub fn new(project_id: u64, name: String, admins: Vec<Pubkey>, goal: u64, beneficiary: Pubkey, bump: u8) -> Result<Self> {
         let initial: u64 = 0;

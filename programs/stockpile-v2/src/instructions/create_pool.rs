@@ -8,7 +8,8 @@ pub fn create_pool(
     name: String,
     start: u64,
     end: u64,
-    admins: Vec<Pubkey>
+    admins: Vec<Pubkey>,
+    access: PoolAccess,
 ) -> Result<()> {  
 
     ctx.accounts.pool.set_inner(
@@ -18,6 +19,7 @@ pub fn create_pool(
             start,
             end,
             admins,
+            access,
             *ctx.bumps
                 .get("pool")
                 .expect("Failed to derive bump for `pool`"),

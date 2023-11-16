@@ -1,18 +1,17 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{token, associated_token};
 
-use solana_gateway::{Gateway, VerificationOptions};
+use solana_gateway::Gateway;
 
 use crate::error::ProtocolError;
 use crate::state::{
     pool::*,
     project::*,
 };
-use crate::util::{
-    SOL_USD_PRICE_FEED_ID, 
+use crate::util::{ 
     USDC_USD_PRICE_FEED_ID, 
-    mint_is_supported, 
-    set_and_maybe_realloc, 
+    set_and_maybe_realloc,
+    mint_is_supported,
     to_pubkey
 };
 
@@ -27,15 +26,9 @@ pub fn contribute_with_vote(
     _project_id: u64,
     amount: u64,
 ) -> Result<()> {
-    //Define Civic gateway pubkey
-    pub const GATEKEEPER_NETWORK: &'static str = "uniqobk8oGh4XBLMqM68K8M2zNu3CdYX7q5go7whQiv";
-
-    // Convert to Pubkey & define verification options
-    let gatekeeper_network = to_pubkey(GATEKEEPER_NETWORK);
-    let verification_options = VerificationOptions {
-        check_expiry: true,
-        expiry_tolerance_seconds: Some(0),
-    };
+    // Define verification options
+    let gatekeeper_network = ctx.accounts.gatekeeper_network.key();
+    let payer = ctx.accounts.payer.key();
 
     // Check to make sure the token is supported
     mint_is_supported(&ctx.accounts.mint.key())?;
@@ -45,11 +38,14 @@ pub fn contribute_with_vote(
 
     // Perform Civic pass verification
     Gateway::verify_gateway_token_account_info(
-        &ctx.accounts.gateway_token_account, 
+        &ctx.accounts.gateway_token_account.to_account_info(), 
         &ctx.accounts.payer.key(), 
         &gatekeeper_network,
-        Some(verification_options),
-    ).expect("User must have a valid Civic pass to create a vote.");
+        None,
+    ).map_err(|_e| {
+        msg!("Gateway token verification failed.");
+        ProtocolError::CivicFailure
+    });
 
     // Add the project to the shares, if it doesn't exist
     let project_key = ctx.accounts.project.key();
@@ -58,28 +54,30 @@ pub fn contribute_with_vote(
     // Iterate through the Participants, and 
     // check if the project exists in the pool
     // If not: break function and return error
-    if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {
+    if let Some(participant) = pool_data.project_shares.iter_mut().find(|p| p.project_key == project_key) {
         let vote_ticket = VoteTicket::new(
-            ctx.accounts.payer.key(), 
+            payer, 
             Some(ctx.accounts.mint.key()), 
             amount, 
         );
 
-        // Double check this
-        // Somewhat peculiar
-        if let Some(participant) = pool_data.project_shares.iter_mut().find(|p| p.project_key == project_key) {
-            participant.share_data.votes.push(vote_ticket);
-        }
+    if let Some(payer_vote_ticket) = participant.share_data.votes.iter_mut().find(|t| t.payer == payer) {
+        payer_vote_ticket.amount += amount;
+    } else {
+        participant.share_data.votes.push(vote_ticket);
 
         set_and_maybe_realloc(
             &mut ctx.accounts.pool, 
-            pool_data, 
+            &pool_data, 
             ctx.accounts.payer.to_account_info(), 
             ctx.accounts.system_program.to_account_info()
         )?;
+    }
+        ctx.accounts.pool.set_inner(pool_data);
     } else {
         return Err(ProtocolError::NotInPool.into());
     }
+
 
     // Transfer the vote to the project
     token::transfer(
@@ -94,9 +92,13 @@ pub fn contribute_with_vote(
         amount,
     )?;
 
+    // Increment fields
+    ctx.accounts.project.raised += amount;
+    ctx.accounts.project.balance += amount;
+    ctx.accounts.project.contributors += 1;
+
     // Update the QF algorithm
     ctx.accounts.pool.update_shares(
-        ctx.accounts.pyth_sol_usd.to_account_info(),
         ctx.accounts.pyth_usdc_usd.to_account_info(),
     )?;
 
@@ -112,25 +114,22 @@ pub fn contribute_with_vote(
 pub struct ContributeWithVote<'info> {
     /// CHECK: Pyth will check this
     #[account(
-        address = to_pubkey(SOL_USD_PRICE_FEED_ID)
-            @ ProtocolError::PythAccountInvalid
-    )]
-    pub pyth_sol_usd: UncheckedAccount<'info>,
-    /// CHECK: Pyth will check this
-    #[account(
         address = to_pubkey(USDC_USD_PRICE_FEED_ID)
             @ ProtocolError::PythAccountInvalid
     )]
     pub pyth_usdc_usd: UncheckedAccount<'info>,
     #[account( 
         mut,
+        realloc = 1024,
+        realloc::payer = payer,
+        realloc::zero = false,
         seeds = [
             Pool::SEED_PREFIX.as_bytes(),
             pool_id.to_le_bytes().as_ref(),
         ],
         bump = pool.bump,
     )]
-    pub pool: Account<'info, Pool>,
+    pub pool: Box<Account<'info, Pool>>,
     #[account( 
         seeds = [
             Project::SEED_PREFIX.as_bytes(),
@@ -138,11 +137,10 @@ pub struct ContributeWithVote<'info> {
         ],
         bump = project.bump,
     )]
-    pub project: Account<'info, Project>,
+    pub project: Box<Account<'info, Project>>,
     pub mint: Account<'info, token::Mint>,
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = mint,
         token::authority = project,
     )]
@@ -155,6 +153,8 @@ pub struct ContributeWithVote<'info> {
     pub payer_token_account: Account<'info, token::TokenAccount>,
     /// CHECK: This is not unsafe because this account isn't written to
     pub gateway_token_account: AccountInfo<'info>,
+    /// CHECK: This is not unsafe because this account isn't written to
+    pub gatekeeper_network: AccountInfo<'info>,
     #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,

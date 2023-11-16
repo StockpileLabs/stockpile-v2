@@ -34,7 +34,7 @@ pub fn fund_pool(
     pool_data.funders.push(ticket);
     set_and_maybe_realloc(
         &mut ctx.accounts.pool, 
-        pool_data, 
+        &pool_data, 
         ctx.accounts.payer.to_account_info(), 
         ctx.accounts.system_program.to_account_info(),
     )?;
