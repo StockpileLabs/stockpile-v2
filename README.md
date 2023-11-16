@@ -75,6 +75,6 @@ anchor build
 </p>
 <h2>Credits</h2>
 <p>
-  Thank you to Joe C (Solana Labs) & Valentin Madrid (Squads) for helping to get us started.
+  Special thank you to Buffalo Joe (Solana Labs) & Valentin Madrid (Squads) for helping to get us started, and Sean (Squads) for technical advisory. 
 </p>
 
