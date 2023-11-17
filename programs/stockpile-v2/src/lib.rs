@@ -71,8 +71,10 @@ pub mod stockpile_v2 {
     pub fn create_source(
         ctx: Context<CreateSource>,
         name: String,
+        pool_id: u64,
+        amount: u64,
     ) -> Result<()> {
-        instructions::create_source(ctx, name)
+        instructions::create_source(ctx, name, pool_id, amount)
     }
 
     pub fn create_milestone(
@@ -162,5 +164,12 @@ pub mod stockpile_v2 {
         _pool_id: u64,
     ) -> Result<()> {
         instructions::claim_payout(ctx, _project_id, _pool_id)
+    }
+
+    pub fn withdraw_funds_from_round(
+        ctx: Context<WithdrawFromRound>,
+        _pool_id: u64
+    ) -> Result<()> {
+        instructions::withdraw_funds_from_round(ctx, _pool_id)
     }
 }

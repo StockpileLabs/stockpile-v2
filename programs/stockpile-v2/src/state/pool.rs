@@ -39,7 +39,7 @@ impl Pool {
         + 4                         // Enum (singleton)
         + 4                         // Enum (singleton)
         + 1                         // u8
-        + 300;                      // Padding
+        + 2500;                     // Padding
 
     pub fn new(pool_id: u64, name: String, start: u64, end: u64, admins: Vec<Pubkey>, access: PoolAccess, bump: u8) -> Result<Self> {
         if name.as_bytes().len() > MAX_NAME_LEN {
@@ -82,6 +82,49 @@ impl Pool {
         match self.pool_state {
             PoolState::PendingStart => Err(ProtocolError::PoolNotStarted.into()),
             PoolState::Active => Ok(()),
+            PoolState::Distributed => Err(ProtocolError::ReleasedFunds.into()),
+            PoolState::Closed => Err(ProtocolError::PoolClosed.into()),
+        }
+    }
+
+    pub fn can_fund(&mut self) -> Result<()> {
+        let current_time = Clock::get()?.unix_timestamp as u64;
+        if current_time > self.end {
+            return Err(ProtocolError::EndDatePassed.into());
+        }
+        if current_time > self.start {
+            self.pool_state = PoolState::Active;
+        }
+        match self.pool_state {
+            PoolState::PendingStart => Ok(()),
+            PoolState::Active => Ok(()),
+            PoolState::Distributed => Err(ProtocolError::ReleasedFunds.into()),
+            PoolState::Closed => Err(ProtocolError::PoolClosed.into()),
+        }
+    }
+
+    pub fn can_withdraw(&mut self) -> Result<()> {
+        let current_time = Clock::get()?.unix_timestamp as u64;
+        if current_time > self.start {
+            self.pool_state = PoolState::Active;
+        }
+
+        if self.project_shares.len() == 0 && current_time > self.end {
+            return Ok(());
+        }
+
+        let mut sum: f64 = 0.0;
+        for share in &self.project_shares {
+            sum += share.share_data.share;
+        };
+
+        if sum == 0.0 && current_time > self.end {
+            return Ok(());
+        }
+
+        match self.pool_state {
+            PoolState::PendingStart => Ok(()),
+            PoolState::Active => Err(ProtocolError::PoolStillActive.into()),
             PoolState::Distributed => Err(ProtocolError::ReleasedFunds.into()),
             PoolState::Closed => Err(ProtocolError::PoolClosed.into()),
         }

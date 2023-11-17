@@ -3,7 +3,6 @@ use anchor_spl::{token, associated_token};
 
 use crate::state::{
     pool::*,
-    source::*,
 };
 use crate::util::{mint_is_supported, set_and_maybe_realloc};
 
@@ -19,12 +18,12 @@ pub fn fund_pool(
     mint_is_supported(&ctx.accounts.mint.key())?;
 
     // Check to make sure the pool is not closed
-    ctx.accounts.pool.is_active()?;
+    ctx.accounts.pool.can_fund()?;
 
     // Record the funder
     // First create a ticket
     let ticket = FundingTicket::new(
-        ctx.accounts.source.key(),
+        ctx.accounts.payer.key(),
         Some(ctx.accounts.mint.key()),
         amount,
     );
@@ -73,18 +72,9 @@ pub struct FundPool<'info> {
         bump = pool.bump,
     )]
     pub pool: Account<'info, Pool>,
-    #[account( 
-        seeds = [
-            FundingSource::SEED_PREFIX.as_bytes(),
-            payer.key().as_ref(),
-        ],
-        bump = source.bump,
-    )]
-    pub source: Account<'info, FundingSource>,
     pub mint: Account<'info, token::Mint>,
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = mint,
         token::authority = pool,
     )]
