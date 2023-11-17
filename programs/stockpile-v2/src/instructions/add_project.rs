@@ -28,8 +28,8 @@ pub fn add_project(ctx: Context<AddProject>, _project_id: u64, _pool_id: u64) ->
 
     if pool_data.pool_access == PoolAccess::Manual {
         ctx.accounts.pool
-        .add_participant(project_key)
-        .expect("Failed to add project.");
+            .add_participant(project_key)
+            .expect("Failed to add project.");
 
         msg!(
             "Fundraiser successfully entered with data: {:?}", 

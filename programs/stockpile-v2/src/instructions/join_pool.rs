@@ -14,13 +14,13 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
     let payer_key = ctx.accounts.payer.key();
     let project = &ctx.accounts.project;
     let project_key = ctx.accounts.project.key();
-    let mut pool_data = ctx.accounts.pool.clone().into_inner();
+    let pool = &mut ctx.accounts.pool;
+    let pool_data = pool.clone().into_inner();
 
     // Fundraiser access control check
     require!(project.admins.contains(&payer_key), ProtocolError::NotAuthorized);
 
-    // Check to make sure the pool is not closed
-    ctx.accounts.pool.is_active()?;
+    pool.is_active()?;
 
     // Check to make sure the fundraiser isnt already in the pool
     if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {
@@ -28,13 +28,13 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
     }
 
     // Check PoolAccess config
-    // For now, Open is the only option exposed.
     if pool_data.pool_access == PoolAccess::Open {
-        pool_data.project_shares.push(
-            Participant::new(
-                project_key, 
-                PoolShare::new(),
-            )
+        pool.add_participant(project_key)
+            .expect("Failed to add project.");
+
+        msg!(
+            "Fundraiser successfully entered with data: {:?}", 
+            project_key.to_string()
         );
     } else {
         // If pool is set to "Manual", return error
