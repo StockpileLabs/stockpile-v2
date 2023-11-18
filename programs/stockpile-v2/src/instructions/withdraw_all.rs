@@ -15,14 +15,21 @@ pub fn withdraw_all(ctx: Context<WithdrawAll>) -> Result<()> {
     // Check to make sure caller is an admin
     require!(project.admins.contains(&payer_key), ProtocolError::NotAuthorized);
 
+    let bump = project.bump.to_le_bytes();
+    let id_ref = project.project_id.to_le_bytes();
+
+    let seeds = vec![Project::SEED_PREFIX.as_bytes(), id_ref.as_ref(), &bump];
+    let signer_seeds = vec![seeds.as_slice()];
+
     token::transfer(
-        CpiContext::new(
+        CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
             token::Transfer {
                 from: ctx.accounts.project_token_account.to_account_info(),
                 to: ctx.accounts.beneficiary_token_account.to_account_info(),
-                authority: ctx.accounts.payer.to_account_info(),
+                authority: project.to_account_info(),
             },
+            &signer_seeds,
         ),
         project.balance.into(),
     )?;

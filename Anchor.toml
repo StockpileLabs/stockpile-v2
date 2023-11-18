@@ -4,7 +4,7 @@ skip-lint = false
 [programs.localnet]
 stockpile_v2 = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 [programs.devnet]
-stockpile_v2 = "5JGt6XDaPuuUttcsu79Jysd6vqtpDFZqLKi1DiGVhMjv"
+stockpile_v2 = "HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32"
 
 [registry]
 url = "https://api.apr.dev"
