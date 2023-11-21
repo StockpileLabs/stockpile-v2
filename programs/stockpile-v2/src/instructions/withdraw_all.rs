@@ -34,6 +34,8 @@ pub fn withdraw_all(ctx: Context<WithdrawAll>) -> Result<()> {
         project.balance.into(),
     )?;
 
+    project.balance -= project.balance;
+
     Ok(())
 }
 
@@ -51,26 +53,18 @@ pub struct WithdrawAll<'info> {
     /// CHECK: This account is safe because we don't write to it
     pub beneficiary: AccountInfo<'info>,
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = mint,
         token::authority = beneficiary,
     )]
     pub beneficiary_token_account: Account<'info, token::TokenAccount>,
     pub mint: Account<'info, token::Mint>,
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         token::mint = mint,
         token::authority = project,
     )]
     pub project_token_account: Account<'info, token::TokenAccount>,
-    #[account(
-        mut,
-        token::mint = mint,
-        token::authority = payer,
-    )]
-    pub payer_token_account: Account<'info, token::TokenAccount>,
     #[account(mut)]
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
