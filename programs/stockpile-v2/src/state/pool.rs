@@ -210,38 +210,6 @@ impl Pool {
 
         Ok(())
     }
-
-    /// Issues all payments according to the `project_shares`
-    pub fn close_and_open_claim(
-        &mut self,
-        pyth_usdc_usd: AccountInfo<'_>,
-        _accounts: &[AccountInfo<'_>],
-    ) -> Result<()> {
-        let usdc_usd_price = try_load_price(pyth_usdc_usd)?;
-        let _pool_total_usd = self.calculate_pool_total_usd(usdc_usd_price)?;
-        
-        /*
-        for account in _accounts {
-            if let Some(participant) = self.project_shares.iter().find(|p| p.project_key == *account.key()) {
-                let participant_share_usd = self.total_funding * participant.share_data.share as u64;
-
-                token::transfer(
-                    CpiContext::new(
-                        ctx.accounts.token_program.to_account_info(),
-                        token::Transfer {
-                            from: ctx.accounts.payer_token_account.to_account_info(),
-                            to: ctx.accounts.project_token_account.to_account_info(),
-                            authority: payer,
-                        },
-                    ),
-                    amount,
-                )?;
-            }
-        }
-        */
-
-        Ok(())
-    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -615,7 +583,7 @@ mod tests {
                 }
             ];
         
-        let mut pool = Pool {
+        let pool = Pool {
             pool_id: 12345,
             name: "Sample Pool".to_owned(),
             total_funding: 1000,

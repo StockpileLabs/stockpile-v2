@@ -1,10 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{token, associated_token};
 
-use crate::state::{
-    pool::*,
-};
-use crate::util::{mint_is_supported, set_and_maybe_realloc};
+use crate::state::pool::*;
+use crate::util::{mint_is_supported, set_and_maybe_realloc, to_pubkey, USDC_DEVNET_MINT};
 
 /// Funds a pool from a `Source` with an SPL Token.
 /// Pools can be funded at any time, they don't have to be active.
@@ -50,6 +48,13 @@ pub fn fund_pool(
         ),
         amount,
     )?;
+
+    ctx.accounts.pool.funders.push(
+        FundingTicket::new(
+            ctx.accounts.payer.key(),
+            Some(to_pubkey(USDC_DEVNET_MINT)), 
+            amount,
+    ));
 
     ctx.accounts.pool.total_funding += amount;
     

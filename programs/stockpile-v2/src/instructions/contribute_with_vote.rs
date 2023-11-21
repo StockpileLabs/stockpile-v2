@@ -65,19 +65,18 @@ pub fn contribute_with_vote(
         payer_vote_ticket.amount += amount;
     } else {
         participant.share_data.votes.push(vote_ticket);
-
+    }
         set_and_maybe_realloc(
             &mut ctx.accounts.pool, 
             &pool_data, 
             ctx.accounts.payer.to_account_info(), 
             ctx.accounts.system_program.to_account_info()
         )?;
-    }
+
         ctx.accounts.pool.set_inner(pool_data);
     } else {
         return Err(ProtocolError::NotInPool.into());
     }
-
 
     // Transfer the vote to the project
     token::transfer(
