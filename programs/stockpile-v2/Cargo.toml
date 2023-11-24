@@ -13,9 +13,6 @@ no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
-localnet = []
-devnet = []
-mainnet = []
 default = []
 
 [dependencies]
@@ -26,3 +23,4 @@ solana-program = "=1.16.17"
 winnow = "=0.4.1"
 toml_datetime="=0.6.1"
 solana-gateway = { version = "0.4.0", features = ["no-entrypoint"] }
+solana-security-txt = "1.1.1"

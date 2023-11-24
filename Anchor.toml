@@ -2,15 +2,17 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-stockpile_v2 = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+stockpile_v2 = "STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8"
 [programs.devnet]
 stockpile_v2 = "HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32"
+[programs.mainnet]
+stockpile_v2 = "STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "mainnet"
 wallet = "/home/sav/.config/solana/id.json"
 
 [scripts]
