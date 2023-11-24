@@ -39,7 +39,19 @@ pub mod util;
 pub use instructions::*;
 use crate::state::pool::*;
 
-declare_id!("HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32");
+use solana_security_txt::security_txt;
+
+#[cfg(not(feature = "no-entrypoint"))]
+security_txt! {
+    name: "Stockpile V2",
+    project_url: "http://stockpile.so",
+    contacts: "email:info@stockpile.so,discord:0xsavant",
+    policy: "https://github.com/StockpileLabs/stockpile-v2/blob/master/SECURITY.md",
+    preferred_languages: "en",
+    source_code: "https://github.com/StockpileLabs/stockpile-v2"
+}
+
+declare_id!("STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8");
 
 #[program]
 pub mod stockpile_v2 {

@@ -69,25 +69,3 @@ where
     //account.set_inner(new_data);
     Ok(())
 }
-
-/* 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn try_set_and_realloc<'info, T>() -> Result<()>
-        where
-            T: AccountDeserialize
-                + AccountSerialize
-                + borsh::BorshDeserialize
-                + borsh::BorshSerialize
-                + Clone + anchor_lang::Owner,
-     {
-        let blank: &mut Account<'info, T> = {
-            
-        }
-
-        Ok(())
-    }
-}
-*/
