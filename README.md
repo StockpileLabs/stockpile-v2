@@ -46,8 +46,8 @@
     Most ecosystems structure grants in milestones. We've taken this into account, and implemented this on-chain in conjunction with both
     general crowdfunding, and funding rounds. Milestones are created under a project, and require the user to specify a condition, along
     with an intended completion date. In addition, future pools will be have the option to gate based on a presence of these accounts.
-    As of right now, there is no approval process, and these exist only for transparency.
-    *NOTE:* This feature is still experimental
+    As of right now, there is no approval process, and these exist only for transparency. This feature is still experimental, and requires
+    proper frontend implementation to be useful.
   </li>
 </ul>
 <h2>Getting Started</h2>
@@ -68,6 +68,8 @@ git clone https://github.com/StockpileProtocol/stockpile-v2.git
 ```
 anchor build
 ```
+<h2>Contributing</h2>
+Review the CONTRIBUTING.md file for more information on how to contribute to Stockpile v2.
 <h2>Disclaimer</h2>
 <p>
   This code is unaudited. Copy and use at your own risk. We incur no liability in the event that a third-party uses this code, and has
