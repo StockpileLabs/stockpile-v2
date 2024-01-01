@@ -4,7 +4,7 @@ skip-lint = false
 [programs.localnet]
 stockpile_v2 = "STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8"
 [programs.devnet]
-stockpile_v2 = "HZR3KsVQAWDRALqtZJWssWXNu9GY9eMt5AQuo2QwSq32"
+stockpile_v2 = "STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8"
 [programs.mainnet]
 stockpile_v2 = "STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8"
 

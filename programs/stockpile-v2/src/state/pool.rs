@@ -155,6 +155,16 @@ impl Pool {
         Ok(())
     }
 
+    pub fn extend_pool_duration(&mut self, new_end: u64) -> Result<()> {
+        if new_end < self.end {
+            return Err(ProtocolError::ExtendDateInvalid.into());
+        }
+
+        self.end = new_end;
+
+        Ok(())
+    }
+
     /// Updates all shares using the Quadratic Funding algorithm
     pub fn update_shares(
         &mut self,

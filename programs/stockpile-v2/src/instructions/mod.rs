@@ -16,6 +16,8 @@ pub mod withdraw;
 pub mod withdraw_all;
 pub mod claim_payout;
 pub mod withdraw_funds_from_round;
+pub mod update_project;
+pub mod extend_pool_duration;
 
 pub use add_project::*;
 pub use close_milestone::*;
@@ -35,3 +37,5 @@ pub use withdraw::*;
 pub use withdraw_all::*;
 pub use claim_payout::*;
 pub use withdraw_funds_from_round::*;
+pub use update_project::*;
+pub use extend_pool_duration::*;
