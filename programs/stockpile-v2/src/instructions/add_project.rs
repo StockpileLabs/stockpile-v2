@@ -19,7 +19,7 @@ pub fn add_project(ctx: Context<AddProject>, _project_id: u64, _pool_id: u64) ->
     require!(pool_data.admins.contains(&payer_key), ProtocolError::NotAuthorized);
 
     // Check to make sure the pool is not closed
-    ctx.accounts.pool.is_active()?;
+    ctx.accounts.pool.can_fund()?;
 
     // Check to make sure the fundraiser isnt already in the pool
     if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {

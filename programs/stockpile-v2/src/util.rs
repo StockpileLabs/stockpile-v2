@@ -11,8 +11,8 @@ pub const USDC_MINT: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 pub const USDC_DEVNET_MINT: &str = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 
 pub const SOL_USD_PRICE_FEED_ID: &str = "ALP8SdU9oARYVLgLR7LrqMNCYBnhtnQz1cj6bwgwQmgj";
-// THIS IS DEVNET
-pub const USDC_USD_PRICE_FEED_ID: &str = "5SSkXsEKQepHHAewytPVwdej4epN1nxgLVM84L4KXgy7";
+// THIS IS MAINNET
+pub const USDC_USD_PRICE_FEED_ID: &str = "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD";
 
 pub const SUPPORTED_SPL_MINTS: [&'static str; 2] = [USDC_MINT, USDC_DEVNET_MINT];
 

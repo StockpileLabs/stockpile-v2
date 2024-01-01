@@ -20,7 +20,7 @@ pub fn join_pool(ctx: Context<JoinPool>, _project_id: u64, _pool_id: u64) -> Res
     // Fundraiser access control check
     require!(project.admins.contains(&payer_key), ProtocolError::NotAuthorized);
 
-    pool.is_active()?;
+    pool.can_fund()?;
 
     // Check to make sure the fundraiser isnt already in the pool
     if pool_data.project_shares.iter().any(|p| p.project_key == project_key) {

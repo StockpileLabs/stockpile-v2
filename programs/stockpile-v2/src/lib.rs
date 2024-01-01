@@ -38,6 +38,7 @@ pub mod util;
 
 pub use instructions::*;
 use crate::state::pool::*;
+use crate::state::project::*;
 
 use solana_security_txt::security_txt;
 
@@ -183,5 +184,21 @@ pub mod stockpile_v2 {
         _pool_id: u64
     ) -> Result<()> {
         instructions::withdraw_funds_from_round(ctx, _pool_id)
+    }
+
+    pub fn update_project(
+        ctx: Context<UpdateProject>,
+        _project_id: u64,
+        update: UpdateField,
+    ) -> Result<()> {
+        instructions::update_project(ctx, _project_id, update)
+    }
+
+    pub fn extend_pool_duration(
+        ctx: Context<ExtendPool>,
+        _pool_id: u64,
+        new_end_date: u64,
+    ) -> Result<()> {
+        instructions::extend_pool_duration(ctx, _pool_id, new_end_date)
     }
 }

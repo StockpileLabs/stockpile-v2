@@ -44,6 +44,9 @@ pub enum ProtocolError {
     #[msg("The end date has already passed")]
     EndDatePassed,
 
+    #[msg("Extend date is less than the current configured end date")]
+    ExtendDateInvalid,
+
     #[msg("An error occurred in the quadratic funding algorithm")]
     AlgorithmFailure,
 

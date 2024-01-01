@@ -119,9 +119,6 @@ pub struct ContributeWithVote<'info> {
     pub pyth_usdc_usd: UncheckedAccount<'info>,
     #[account( 
         mut,
-        realloc = 1024,
-        realloc::payer = payer,
-        realloc::zero = false,
         seeds = [
             Pool::SEED_PREFIX.as_bytes(),
             pool_id.to_le_bytes().as_ref(),

@@ -72,3 +72,13 @@ impl Default for ProjectStatus {
         ProjectStatus::Active
     }
 }
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum UpdateField {
+    Name(String),
+    Goal(u64),
+    AddAdmin(Pubkey),
+    RemoveAdmin(Pubkey),
+    Beneficiary(Pubkey),
+    Status(ProjectStatus),
+}
