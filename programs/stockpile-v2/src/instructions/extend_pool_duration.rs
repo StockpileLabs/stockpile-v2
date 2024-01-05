@@ -15,7 +15,8 @@ pub fn extend_pool_duration(
 
     require!(pool.admins.contains(&payer.key()), ProtocolError::NotAuthorized);
 
-    pool.extend_pool_duration(new_end_date).expect("Failed to update end date.");
+    pool.extend_pool_duration(new_end_date)
+    .expect("Failed to update end date.");
     
     Ok(())
 }

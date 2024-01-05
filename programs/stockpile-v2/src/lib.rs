@@ -194,6 +194,14 @@ pub mod stockpile_v2 {
         instructions::update_project(ctx, _project_id, update)
     }
 
+    pub fn update_pool(
+        ctx: Context<UpdatePool>,
+        _pool_id: u64,
+        update: UpdatePoolField,
+    ) -> Result<()> {
+        instructions::update_pool(ctx, _pool_id, update)
+    }
+
     pub fn extend_pool_duration(
         ctx: Context<ExtendPool>,
         _pool_id: u64,
