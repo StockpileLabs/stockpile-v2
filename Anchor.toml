@@ -12,7 +12,7 @@ stockpile_v2 = "STKUaKniasuqrfer3XNbmrrc578pkL1XACdK8H3YPu8"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "mainnet"
+cluster = "devnet"
 wallet = "/home/sav/.config/solana/id.json"
 
 [scripts]

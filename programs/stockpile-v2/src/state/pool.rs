@@ -382,6 +382,16 @@ fn calculate_total_square_root_votes_usd(
     Ok(total_square_root_votes_usd_mut as f64)
 }
 
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub enum UpdatePoolField {
+    Name(String),
+    AddAdmin(Pubkey),
+    RemoveAdmin(Pubkey),
+    Approval(PoolAccess),
+    Status(PoolState),
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
